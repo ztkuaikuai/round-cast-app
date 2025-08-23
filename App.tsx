@@ -1,13 +1,16 @@
-import { ScreenContent } from 'components/ScreenContent';
 import { StatusBar } from 'expo-status-bar';
+import { Container } from 'components/Container';
 
 import './global.css';
+import Hero from 'components/Hero';
 
 export default function App() {
   return (
     <>
-      <ScreenContent title="Hello World" path="App.tsx"></ScreenContent>
       <StatusBar style="auto" />
+      <Container>
+        <Hero />
+      </Container>
     </>
   );
 }
