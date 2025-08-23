@@ -1,16 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
-import { Container } from 'components/Container';
 
 import './global.css';
 import Hero from 'components/Hero';
+import Layout from 'app/layout';
 
 export default function App() {
   return (
     <>
       <StatusBar style="auto" />
-      <Container>
+      <Layout>
         <Hero />
-      </Container>
+      </Layout>
     </>
   );
 }
