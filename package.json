@@ -9,7 +9,8 @@
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\" && prettier -c \"**/*.{js,jsx,ts,tsx,json}\"",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "web": "expo start --web",
-    "eas:build:android": "eas build --platform android --profile development"
+    "eas:build:android": "eas build --platform android --profile development",
+    "eas:build:ios": "eas build --platform ios --profile development"
   },
   "dependencies": {
     "expo": "53.0.22",

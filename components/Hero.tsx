@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
+import { View, Text, Image, TouchableOpacity, Dimensions, Platform } from "react-native";
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useResponsive } from "utils/responsive";
 
@@ -87,7 +87,13 @@ const Hero = () => {
             {/* [TODO]有时间的话优化这里的字重为400，目前应用无效 */}
             <Text
                 className="text-[#1E0F59] text-center"
-                style={{ fontFamily: 'Montserrat', fontWeight: "700", lineHeight: verticalScale(32), fontSize: scale(24), width: scale(376), height: scale(60) }}
+                style={{
+                    fontFamily: 'Montserrat',
+                    fontWeight: Platform.OS === 'ios' ? '400' : '700',
+                    lineHeight: verticalScale(32),
+                    fontSize: scale(24),
+                    width: scale(376)
+                }}
             >
                 Every perspective deserves a seat at our round table
             </Text>
@@ -98,8 +104,9 @@ const Hero = () => {
                     className="bg-[#D6DD18]"
                     style={{
                         paddingHorizontal: scale(40),
-                        paddingBottom: verticalScale(12),
-                        borderRadius: verticalScale(60)
+                        paddingBottom: Platform.OS === 'ios' ? verticalScale(4) : verticalScale(10),
+                        borderRadius: verticalScale(60),
+                        paddingTop: Platform.OS === 'ios' ? verticalScale(4) : 0,
                     }}
                     onPress={() => {
                         console.log('Start to Talk pressed');
