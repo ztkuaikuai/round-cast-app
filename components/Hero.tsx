@@ -6,7 +6,7 @@ const Hero = () => {
     const { scale, verticalScale } = useResponsive();
     return (
         <View
-            className="flex-1 flex justify-center"
+            className="flex-1 flex justify-center bg-[#FFF7D3]"
             style={{ paddingHorizontal: scale(27), paddingVertical: verticalScale(27), gap: verticalScale(29) }}
         >
             {/* Welcome */}
@@ -35,7 +35,7 @@ const Hero = () => {
                 </View>
                 <View
                     className="absolute z-0"
-                    style={{ width: verticalScale(139), height: verticalScale(136), top: verticalScale(340), left: 0 }}
+                    style={{ width: verticalScale(139), height: verticalScale(136), top: verticalScale(354), left: scale(40) }}
                 >
                     <Svg width="100%" height="100%" viewBox="0 0 139 136" fill="none">
                         <Path d="M41.5514 46.6499L33.5379 7.53584L64.7968 33.9636L88.8829 0.802161L90.7187 39.4023L131.913 31.193L102.579 61.8718L138.148 85.1203L95.05 88.0136L103.237 127.611L71.8409 102.323L47.7548 135.484L45.8827 95.2613L5.51698 104.264L33.849 72.3085L0.28416 51.6137L41.5514 46.6499Z" fill="#00C4FF" />
