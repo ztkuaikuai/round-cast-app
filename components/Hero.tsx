@@ -19,7 +19,12 @@ const Hero = () => {
                 </Text>
                 <View
                     className="absolute z-0"
-                    style={{ width: verticalScale(370), height: verticalScale(362), top: verticalScale(-20), left: 0 }}
+                    style={{ 
+                        width: verticalScale(370), 
+                        height: verticalScale(362), 
+                        top: verticalScale(-20), 
+                        left: 0
+                    }}
                 >
                     <Svg width="100%" height="100%" viewBox="0 0 370 362" fill="none">
                         <Path d="M110.92 123.147L89.4404 18.3033L173.229 89.1419L237.791 0.253921L242.712 103.72L353.133 81.7154L274.504 163.949L369.845 226.266L254.321 234.021L276.265 340.16L192.11 272.376L127.548 361.264L122.53 253.448L14.3313 277.58L90.2742 191.924L0.304924 136.452L110.92 123.147Z" fill="#FED25C" />
@@ -43,12 +48,12 @@ const Hero = () => {
                 </View>
                 <Image
                     source={require("assets/headphone.png")}
-                    className="absolute -rotate-[30deg] -scale-x-100 aspect-[104/97]"
+                    className="absolute aspect-[104/97] animate-float-rotated-headphone"
                     style={{ width: scale(252), height: verticalScale(234), top: verticalScale(120), left: scale(-20) }}
                 />
                 <Image
                     source={require("assets/microphone.png")}
-                    className="absolute rotate-[15deg] aspect-[61/57]"
+                    className="absolute aspect-[61/57] animate-float-rotated-microphone"
                     style={{ width: scale(375), height: verticalScale(350), top: verticalScale(160), right: scale(-100) }}
                 />
                 {/* 圆点 */}
@@ -73,12 +78,13 @@ const Hero = () => {
             {/* RoundCast Title */}
             <Text
                 className="items-center text-[#1E0F59] text-center"
-                style={{ fontFamily: "Anton-Regular", fontSize: scale(68), paddingTop: verticalScale(400), marginBottom: verticalScale(-24) }}
+                style={{ fontFamily: "Anton-Regular", fontSize: scale(68), paddingTop: verticalScale(360), marginBottom: verticalScale(-24) }}
             >
                 RoundCast
             </Text>
 
             {/* Subtitle */}
+            {/* [TODO]有时间的话优化这里的字重为400，目前应用无效 */}
             <Text
                 className="text-[#1E0F59] text-center"
                 style={{ fontFamily: 'Montserrat', fontWeight: "700", lineHeight: verticalScale(32), fontSize: scale(24), width: scale(376), height: scale(60) }}
