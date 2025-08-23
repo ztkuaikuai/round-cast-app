@@ -12,8 +12,8 @@ const Hero = () => {
             {/* Welcome */}
             <View className="items-center relative">
                 <Text
-                    className="text-[#403284] font-bold text-center z-10 w-full"
-                    style={{ fontSize: scale(72) }}
+                    className="text-[#403284] text-center z-10 w-full"
+                    style={{ fontFamily: "Anton-Regular", fontSize: scale(72)}}
                 >
                     Welcome
                 </Text>
@@ -72,8 +72,8 @@ const Hero = () => {
 
             {/* RoundCast Title */}
             <Text
-                className="items-center text-[#1E0F59] font-bold text-center"
-                style={{ fontSize: scale(68), paddingTop: verticalScale(420) }}
+                className="items-center text-[#1E0F59] text-center"
+                style={{ fontFamily: "Anton-Regular", fontSize: scale(68), paddingTop: verticalScale(400), marginBottom: verticalScale(-24) }}
             >
                 RoundCast
             </Text>
@@ -81,7 +81,7 @@ const Hero = () => {
             {/* Subtitle */}
             <Text
                 className="text-[#1E0F59] text-center"
-                style={{ lineHeight: verticalScale(32), fontSize: scale(24), width: scale(376), height: scale(60) }}
+                style={{ fontFamily: 'Montserrat', fontWeight: "700", lineHeight: verticalScale(32), fontSize: scale(24), width: scale(376), height: scale(60) }}
             >
                 Every perspective deserves a seat at our round table
             </Text>
@@ -92,14 +92,14 @@ const Hero = () => {
                     className="bg-[#D6DD18]"
                     style={{
                         paddingHorizontal: scale(40),
-                        paddingVertical: verticalScale(12),
+                        paddingBottom: verticalScale(12),
                         borderRadius: verticalScale(60)
                     }}
                     onPress={() => {
                         console.log('Start to Talk pressed');
                     }}
                 >
-                    <Text className="text-[#1E0F59] text-center" style={{ fontSize: scale(28) }}>
+                    <Text className="text-[#1E0F59] text-center" style={{ fontFamily: "Anton-Regular", fontSize: scale(28) }}>
                         Start to <Text style={{ fontSize: scale(32) }}>Talk</Text>
                     </Text>
                 </TouchableOpacity>
