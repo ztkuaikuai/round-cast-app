@@ -1,9 +1,11 @@
+import { useRouter } from "expo-router";
 import { View, Text, Image, TouchableOpacity, Dimensions, Platform } from "react-native";
 import Svg, { Circle, Path } from 'react-native-svg';
 import { useResponsive } from "utils/responsive";
 
 const Hero = () => {
     const { scale, verticalScale } = useResponsive();
+    const router = useRouter();
     return (
         <View
             className="flex-1 flex justify-center bg-[#FFF7D3]"
@@ -110,6 +112,7 @@ const Hero = () => {
                     }}
                     onPress={() => {
                         console.log('Start to Talk pressed');
+                        router.replace("/home")
                     }}
                 >
                     <Text className="text-[#1E0F59] text-center" style={{ fontFamily: "Anton-Regular", fontSize: scale(28) }}>

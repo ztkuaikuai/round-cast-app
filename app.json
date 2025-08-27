@@ -13,9 +13,13 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/Anton-Regular.ttf", "./assets/Montserrat.ttf"]
+          "fonts": [
+            "./assets/Anton-Regular.ttf",
+            "./assets/Montserrat.ttf"
+          ]
         }
-      ]
+      ],
+      "expo-router"
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,6 +32,7 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "scheme": "roundcast",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.kuaikuaitz.roundcast",
