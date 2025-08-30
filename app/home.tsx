@@ -30,7 +30,13 @@ const Home = () => {
               height: scale(20)
             }}
             onPress={() => {
-              router.push('/sidebar');
+              router.push({
+                pathname: '/sidebar',
+                params: {}
+              }, {
+                // 确保使用从左侧滑入的动画
+                relativeToDirectory: false
+              });
             }}
           >
             <Svg width="100%" height="100%" viewBox="0 0 20 20" fill="none">
