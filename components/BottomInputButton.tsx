@@ -114,11 +114,11 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
             <View
                 style={{
                     width: scale(398),
-                    height: verticalScale(60),
+                    minHeight: verticalScale(60),
                     borderRadius: verticalScale(30),
                     backgroundColor: '#ffffff',
                     flexDirection: 'row',
-                    alignItems: 'center',
+                    alignItems: inputMode === 'text' ? 'flex-end' : 'center',
                     justifyContent: 'space-between',
                     paddingHorizontal: scale(20),
                     marginHorizontal: 'auto',
@@ -152,7 +152,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                         />
                         {/* Hold to Speak Button - 占据大部分空间 */}
                         <TouchableOpacity
-                            className="flex-1 justify-center items-center"
+                            className="flex-1 items-center"
                             style={{
                                 height: '100%',
                                 zIndex: 1,
@@ -196,6 +196,9 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                                         inputRange: [0, 1],
                                         outputRange: [1, 0],
                                     }),
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    height: verticalScale(60),
                                 }}
                             >
                                 <Text
@@ -204,6 +207,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                                         fontFamily: "Anton-Regular",
                                         fontSize: scale(28),
                                         lineHeight: verticalScale(42),
+                                        textAlignVertical: 'center',
                                     }}
                                 >
                                     Hold to Speak
@@ -250,22 +254,27 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                     <>
                         {/* 文本输入模式 */}
                         {/* 输入框 */}
-                        <View className="flex-1" style={{ paddingRight: scale(10) }}>
+                        <View className="flex-1 justify-center" style={{ paddingRight: scale(4) }}>
                             <TextInput
                                 style={{
                                     fontFamily: 'Montserrat',
                                     fontSize: scale(17),
-                                    color: inputText ? '#1E0F59' : '#656565',
-                                    height: '100%',
+                                    color: '#1E0F59',
+                                    minHeight: verticalScale(44),
+                                    maxHeight: verticalScale(180),
                                     paddingLeft: scale(15),
+                                    paddingBottom: scale(16),
+                                    textAlignVertical: 'center',
                                 }}
                                 placeholder="What do you want to know?"
                                 placeholderTextColor="#656565"
                                 value={inputText}
                                 onChangeText={setInputText}
-                                multiline={false}
+                                multiline={true}
                                 onSubmitEditing={handleSendMessage}
                                 returnKeyType="send"
+                                blurOnSubmit={false}
+                                scrollEnabled={true}
                             />
                         </View>
 
@@ -276,6 +285,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                                 width: scale(41),
                                 height: scale(41),
                                 marginRight: scale(8),
+                                marginBottom: verticalScale(9),
                             }}
                             onPress={() => {
                                 console.log('Switch to voice input mode');
@@ -293,6 +303,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                             style={{
                                 width: scale(41),
                                 height: scale(41),
+                                marginBottom: verticalScale(9),
                             }}
                             onPress={() => {
                                 console.log('Switch to voice input mode');
@@ -317,6 +328,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                             style={{
                                 width: scale(41),
                                 height: scale(41),
+                                marginBottom: verticalScale(9),
                             }}
                             onPress={handleSendMessage}
                         >
