@@ -12,7 +12,7 @@ const Sidebar = () => {
 
   // 模拟用户数据
   const userData = {
-    avatar: 'https://via.placeholder.com/93x93', // 临时占位图
+    avatar: 'https://webp.kuaikuaitz.top/avatar_kk2.jpg', // 临时占位图
     name: 'Anastasia Joeng',
     id: '34567890',
     tags: ['Tech Enthusiast', 'Cat mom', 'PM']
@@ -84,16 +84,6 @@ const Sidebar = () => {
           name={userData.name}
           id={userData.id}
           tags={userData.tags}
-        />
-
-        {/* 分隔线 */}
-        <View 
-          style={{
-            height: 1,
-            backgroundColor: 'rgba(30, 15, 89, 0.1)',
-            marginHorizontal: scale(20),
-            marginBottom: verticalScale(20)
-          }}
         />
 
         {/* 历史会话区域 */}

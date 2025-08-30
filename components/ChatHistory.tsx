@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Platform } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Platform, Image } from 'react-native'
 import { useResponsive } from 'utils/responsive'
 
 interface ChatSession {
@@ -42,22 +42,31 @@ interface ChatSessionItemProps {
 const ChatSessionItem = ({ session, onPress }: ChatSessionItemProps) => {
   const { scale, verticalScale } = useResponsive()
 
+  // 根据 session id 获取对应的 vibe 图片
+  const getVibeImage = (id: string) => {
+    const imageIndex = (parseInt(id) % 9) + 1 // 1-9 对应 1.png - 9.png
+    
+    // 创建图片资源映射数组
+    const vibeImages = [
+      require('assets/vibe/1.png'),
+      require('assets/vibe/2.png'),
+      require('assets/vibe/3.png'),
+      require('assets/vibe/4.png'),
+      require('assets/vibe/5.png'),
+      require('assets/vibe/6.png'),
+      require('assets/vibe/7.png'),
+      require('assets/vibe/8.png'),
+      require('assets/vibe/9.png'),
+    ]
+    
+    return vibeImages[imageIndex - 1] || vibeImages[0] // 默认返回第一张图片
+  }
+
   // 根据颜色索引获取背景色
   const getBackgroundColor = (colorIndex: number) => {
     const colors = [
       '#FED25C',  // 黄色
       '#FD7416',  // 橙色
-      '#00C4FF',  // 蓝色
-      '#D6DD18',  // 绿黄色
-    ]
-    return colors[colorIndex % colors.length]
-  }
-
-  // 根据颜色索引获取对应的图标背景色
-  const getIconBackgroundColor = (colorIndex: number) => {
-    const colors = [
-      '#FED25C',  // 黄色
-      '#FD7416',  // 橙色  
       '#00C4FF',  // 蓝色
       '#D6DD18',  // 绿黄色
     ]
@@ -77,26 +86,23 @@ const ChatSessionItem = ({ session, onPress }: ChatSessionItemProps) => {
         paddingHorizontal: scale(10)
       }}
     >
-      {/* 左侧图标区域 */}
+      {/* 左侧图片区域 */}
       <View
         style={{
           width: scale(83),
           height: verticalScale(89),
-          backgroundColor: getIconBackgroundColor(session.colorIndex),
           borderRadius: 12,
           marginRight: scale(16),
-          justifyContent: 'center',
-          alignItems: 'center'
+          overflow: 'hidden'
         }}
       >
-        {/* 简单的圆点装饰，模拟图标 */}
-        <View
+        <Image
+          source={getVibeImage(session.id)}
           style={{
-            width: scale(24),
-            height: scale(24),
-            backgroundColor: 'rgba(30, 15, 89, 0.3)',
-            borderRadius: scale(12)
+            width: '100%',
+            height: '100%'
           }}
+          resizeMode="cover"
         />
       </View>
 

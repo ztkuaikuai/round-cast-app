@@ -29,6 +29,7 @@ const Home = () => {
               width: scale(20),
               height: scale(20)
             }}
+            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
             onPress={() => {
               router.push({
                 pathname: '/sidebar',
