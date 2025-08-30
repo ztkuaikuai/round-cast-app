@@ -111,7 +111,6 @@ const Hero = () => {
                         paddingTop: Platform.OS === 'ios' ? verticalScale(4) : 0,
                     }}
                     onPress={() => {
-                        console.log('Start to Talk pressed');
                         router.replace("/home")
                     }}
                 >
