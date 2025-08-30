@@ -1,19 +1,108 @@
 import { Container } from "components/Container";
 import BottomInputButton from "components/BottomInputButton";
+import ChatMessages from "components/ChatMessages";
 import { View, Text, TouchableOpacity, Platform } from "react-native";
 import Svg, { Rect } from 'react-native-svg';
 import { useResponsive } from "utils/responsive";
 import { useRouter } from "expo-router";
+import { useState, useEffect } from "react";
+
+interface ChatMessage {
+  id: string
+  type: 'user' | 'agent'
+  content: string
+  timestamp?: string
+  imageCard?: {
+    imageUrl: any
+    title?: string
+  }
+}
 
 const Home = () => {
   const { scale, verticalScale } = useResponsive();
   const router = useRouter();
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [showChat, setShowChat] = useState(false);
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
+  
+  // 模拟 Agent 响应的假数据
+  const mockAgentResponses = [
+    {
+      content: "Here it comes~ Please click below to access the podcast content",
+      imageCard: {
+        imageUrl: require('assets/vibe/1.png'),
+        title: "Long time no see~ Click below to join the discussion."
+      }
+    },
+    {
+      content: "The podcast has been generated. Click to listen to the information you want.",
+      imageCard: {
+        imageUrl: require('assets/vibe/2.png')
+      }
+    },
+    {
+      content: "How are the stocks lately",
+      imageCard: {
+        imageUrl: require('assets/vibe/3.png')
+      }
+    },
+    {
+      content: "The news about multiagent",
+      imageCard: {
+        imageUrl: require('assets/vibe/4.png')
+      }
+    }
+  ];
   
   // 处理发送消息
   const handleSendMessage = (message: string) => {
     console.log('Message sent from BottomInputButton:', message);
-    // 这里可以添加发送消息的逻辑，比如调用API等
+    
+    // 添加用户消息
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: message,
+      timestamp: new Date().toISOString()
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setShowChat(true);
+    setShouldScrollToBottom(true);
+    
+    // 模拟 Agent 延迟响应
+    setTimeout(() => {
+      const responseIndex = Math.floor(Math.random() * mockAgentResponses.length);
+      const mockResponse = mockAgentResponses[responseIndex];
+      
+      const agentMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        type: 'agent',
+        content: mockResponse.content,
+        timestamp: new Date().toISOString(),
+        imageCard: mockResponse.imageCard
+      };
+      
+      setMessages(prev => [...prev, agentMessage]);
+      setShouldScrollToBottom(true);
+    }, 1000);
   };
+
+  // 处理图片卡片点击
+  const handleImageCardPress = (messageId: string) => {
+    console.log('Image card pressed for message:', messageId);
+    // 这里可以添加跳转到播客播放页面的逻辑
+  };
+
+  // 重置滚动状态，避免每次组件更新都触发滚动
+  useEffect(() => {
+    if (shouldScrollToBottom) {
+      const timer = setTimeout(() => {
+        setShouldScrollToBottom(false);
+      }, 800); // 增加时间让滚动动画完全完成
+      return () => clearTimeout(timer);
+    }
+  }, [shouldScrollToBottom]);
 
   return (
     <Container>
@@ -66,21 +155,33 @@ const Home = () => {
           </View>
         </View>
 
-        {/* Central Message */}
-        <View className="flex-1 justify-center items-center">
-          <Text
-            className="text-[#1E0F59] text-center"
-            style={{
-              fontFamily: 'Montserrat',
-              fontWeight: Platform.OS === 'ios' ? '400' : '700',
-              fontSize: scale(24),
-              lineHeight: verticalScale(29),
-              width: scale(401)
-            }}
-          >
-            Feel free to ask me{'\n'}anything you want to know
-          </Text>
-        </View>
+        {/* 根据是否有对话来显示不同内容 */}
+        {showChat ? (
+          /* 对话界面 */
+          <View className="flex-1" style={{ marginTop: verticalScale(20) }}>
+            <ChatMessages 
+              messages={messages} 
+              onImageCardPress={handleImageCardPress}
+              scrollToBottom={shouldScrollToBottom}
+            />
+          </View>
+        ) : (
+          /* 初始欢迎界面 */
+          <View className="flex-1 justify-center items-center">
+            <Text
+              className="text-[#1E0F59] text-center"
+              style={{
+                fontFamily: 'Montserrat',
+                fontWeight: Platform.OS === 'ios' ? '400' : '700',
+                fontSize: scale(24),
+                lineHeight: verticalScale(29),
+                width: scale(401)
+              }}
+            >
+              Feel free to ask me{'\n'}anything you want to know
+            </Text>
+          </View>
+        )}
 
         {/* Bottom Section with BottomInputButton Component */}
         <BottomInputButton onSendMessage={handleSendMessage} />
