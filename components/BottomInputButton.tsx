@@ -95,7 +95,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                 useNativeDriver: false,
             }),
         ]).start();
-
+        onSendMessage?.("当下可能会被AI取代的工作有什么？如何避免不被取代呢？");
         console.log('Hold to Speak - Press ended');
     };
 

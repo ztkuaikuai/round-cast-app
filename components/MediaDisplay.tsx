@@ -9,7 +9,7 @@ interface MediaDisplayProps {
     onPlayPause?: () => void;
 }
 
-const MediaDisplay = ({ imageSource, isPlaying = false, onPlayPause }: MediaDisplayProps) => {
+const MediaDisplay = ({ imageSource, isPlaying = true, onPlayPause }: MediaDisplayProps) => {
     const { scale, verticalScale } = useResponsive();
     const [localIsPlaying, setLocalIsPlaying] = useState(isPlaying);
 
