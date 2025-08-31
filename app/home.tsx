@@ -28,9 +28,9 @@ const Home = () => {
   const mockAgentResponses = [
     {
       id: 1,
-      content: "Here it comes~ Please click below to access the podcast content",
+      content: "来了哦~请点击下方进入播客内容",
       imageCard: {
-        title: "Long time no see~ Click below to join the discussion."
+        title: "好久不见，筷筷～加入我们的对话吧！"
       }
     },
     {
@@ -75,7 +75,7 @@ const Home = () => {
       const mockResponse = mockAgentResponses[responseIndex];
       
       const agentMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
+        id: mockResponse.id.toString(),
         type: 'agent',
         content: mockResponse.content,
         timestamp: new Date().toISOString(),

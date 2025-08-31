@@ -1,29 +1,26 @@
 import { Container } from 'components/Container'
 import UserInfo from 'components/UserInfo'
 import ChatHistory from 'components/ChatHistory'
-import { Link, useRouter } from 'expo-router'
-import { View, Text, TouchableOpacity, Platform } from 'react-native'
-import Svg, { Path } from 'react-native-svg'
-import { useResponsive } from 'utils/responsive'
+import { useRouter } from 'expo-router'
+import { View } from 'react-native'
 
 const Sidebar = () => {
   const router = useRouter();
-  const { scale, verticalScale } = useResponsive();
 
   // 模拟用户数据
   const userData = {
     avatar: 'https://webp.kuaikuaitz.top/avatar_kk2.jpg', // 临时占位图
-    name: 'Anastasia Joeng',
+    name: 'KuaiKuai',
     id: '34567890',
-    tags: ['Tech Enthusiast', 'Cat mom', 'PM']
+    tags: ['Tech Enthusiast', 'Cat', 'PM']
   }
 
   // 模拟聊天历史数据
   const chatSessions = [
     {
       id: '1',
-      title: 'News about Multiagent',
-      date: '2025-08-20',
+      title: '会被AI取代的工作有什么',
+      date: '2025-08-31',
       colorIndex: 0
     },
     {

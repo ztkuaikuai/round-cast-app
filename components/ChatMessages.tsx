@@ -151,7 +151,6 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
               fontSize: scale(17),
               color: '#1E0F59',
               lineHeight: scale(21),
-              textAlign: isUser ? 'right' : 'left',
               marginBottom: !isUser && message.imageCard ? verticalScale(12) : 0
             }}
           >

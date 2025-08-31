@@ -49,7 +49,7 @@ const TaskHeader = ({ title }: TaskHeaderProps) => {
                 <Text
                     className="text-[#1E0F59] text-center"
                     style={{
-                        fontFamily: "Anton-Regular",
+                        // fontFamily: "Anton-Regular",
                         fontSize: scale(24),
                         lineHeight: verticalScale(36),
                     }}
@@ -67,12 +67,12 @@ const TaskHeader = ({ title }: TaskHeaderProps) => {
                     // TODO: 实现分享或更多操作功能
                 }}
                 style={{
-                    width: scale(31),
-                    height: scale(34),
+                    width: scale(28),
+                    height: scale(28),
                     justifyContent: 'center',
                     alignItems: 'center',
                 }}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                hitSlop={10}
             >
                 <Svg width="100%" height="100%" viewBox="0 0 31 34" fill="none">
                     <Path 
