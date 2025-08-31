@@ -3,6 +3,7 @@ import { useResponsive } from 'utils/responsive'
 import { useRouter } from 'expo-router'
 import { useRef, useEffect } from 'react'
 import Svg, { Circle, Polygon } from 'react-native-svg'
+import { getVibeImage } from 'utils/getVibeImage'
 
 interface ChatMessage {
   id: string
@@ -10,7 +11,6 @@ interface ChatMessage {
   content: string
   timestamp?: string
   imageCard?: {
-    imageUrl: any
     title?: string
   }
 }
@@ -178,7 +178,7 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
                 }}
               >
                 <Image
-                  source={message.imageCard.imageUrl}
+                  source={getVibeImage(message.id)}
                   style={{
                     width: '100%',
                     height: '100%'

@@ -13,7 +13,6 @@ interface ChatMessage {
   content: string
   timestamp?: string
   imageCard?: {
-    imageUrl: any
     title?: string
   }
 }
@@ -28,28 +27,28 @@ const Home = () => {
   // 模拟 Agent 响应的假数据
   const mockAgentResponses = [
     {
+      id: 1,
       content: "Here it comes~ Please click below to access the podcast content",
       imageCard: {
-        imageUrl: require('assets/vibe/1.png'),
         title: "Long time no see~ Click below to join the discussion."
       }
     },
     {
+      id: 2,
       content: "The podcast has been generated. Click to listen to the information you want.",
       imageCard: {
-        imageUrl: require('assets/vibe/2.png')
       }
     },
     {
+      id: 3,
       content: "How are the stocks lately",
       imageCard: {
-        imageUrl: require('assets/vibe/3.png')
       }
     },
     {
+      id: 4,
       content: "The news about multiagent",
       imageCard: {
-        imageUrl: require('assets/vibe/4.png')
       }
     }
   ];

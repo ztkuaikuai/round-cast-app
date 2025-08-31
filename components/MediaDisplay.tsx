@@ -59,6 +59,7 @@ const MediaDisplay = ({ imageSource, isPlaying = false, onPlayPause }: MediaDisp
                                 height: scale(60),
                             }}
                             activeOpacity={0.8}
+                            hitSlop={170}
                         >
                             <Svg width="100%" height="100%" viewBox="0 0 60 60" fill="none">
                                 {/* 播放按钮背景圆 */}

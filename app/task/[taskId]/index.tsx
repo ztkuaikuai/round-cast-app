@@ -1,17 +1,29 @@
 import { useLocalSearchParams } from 'expo-router'
 import { View } from 'react-native'
+import { useState } from 'react'
 import { Container } from '../../../components/Container'
 import TaskHeader from '../../../components/TaskHeader'
 import MediaDisplay from '../../../components/MediaDisplay'
 import ConversationContent from '../../../components/ConversationContent'
 import BottomInputButton from '../../../components/BottomInputButton'
+import { getVibeImage } from 'utils/getVibeImage'
+
+// 定义消息类型
+interface Message {
+    id: string;
+    speaker: {
+        name: string;
+        role: 'host' | 'user' | 'expert';
+    };
+    content: string;
+}
 
 const Task = () => {
     const { taskId } = useLocalSearchParams()
     console.log("🚀 ~ Task ~ taskId:", taskId)
     
-    // 模拟会话数据
-    const mockMessages = [
+    // 初始化消息状态
+    const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
             speaker: { name: 'Alex', role: 'host' as const },
@@ -42,11 +54,20 @@ const Task = () => {
             speaker: { name: 'Alex', role: 'host' as const },
             content: 'Thanks, Dr. Lee! And Sam—great question! Tune in next week for \'AI in Space.\' Catch you later!'
         }
-    ];
+    ]);
 
     const handleSendMessage = (message: string) => {
         console.log('New message from user:', message);
-        // TODO: 处理发送消息的逻辑
+        
+        // 创建新的用户消息
+        const newMessage: Message = {
+            id: Date.now().toString(), // 使用时间戳作为简单的ID
+            speaker: { name: '', role: 'user' },
+            content: message
+        };
+        
+        // 将新消息追加到消息列表中
+        setMessages(prevMessages => [...prevMessages, newMessage]);
     };
 
     const handlePlayPause = () => {
@@ -61,12 +82,13 @@ const Task = () => {
                 <TaskHeader title="Multi-agent Systems" />
                 
                 {/* 展示区域 */}
-                <MediaDisplay 
+                <MediaDisplay
+                    imageSource={getVibeImage(taskId as string)}
                     onPlayPause={handlePlayPause}
                 />
                 
                 {/* 会话内容区域 */}
-                <ConversationContent messages={mockMessages} />
+                <ConversationContent messages={messages} />
                 
                 {/* 底部输入按钮 */}
                 <BottomInputButton onSendMessage={handleSendMessage} />

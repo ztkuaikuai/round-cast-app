@@ -79,7 +79,7 @@ const Sidebar = () => {
     <Container>
       <View style={{ flex: 1 }}>
         {/* 用户信息区域 */}
-        <UserInfo 
+        <UserInfo
           avatar={userData.avatar}
           name={userData.name}
           id={userData.id}
@@ -87,7 +87,7 @@ const Sidebar = () => {
         />
 
         {/* 历史会话区域 */}
-        <ChatHistory 
+        <ChatHistory
           sessions={chatSessions}
           onSessionPress={handleSessionPress}
         />
