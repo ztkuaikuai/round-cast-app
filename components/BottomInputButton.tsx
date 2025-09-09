@@ -34,7 +34,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
         generateAudioLevels();
         animationRef.current = setInterval(() => {
             generateAudioLevels();
-        }, 150); // 每150ms更新一次
+        }, 80); // 每16.6ms更新一次
     };
 
     // 停止音量波动动画
