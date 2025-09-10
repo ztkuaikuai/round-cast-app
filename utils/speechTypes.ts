@@ -70,12 +70,7 @@ export const BAIDU_ERROR_CODES: Record<number, string> = {
 };
 
 // 语音识别状态类型
-export type SpeechRecognitionStatus = 
-  | 'idle'
-  | 'recording' 
-  | 'processing' 
-  | 'completed'
-  | 'error';
+export type SpeechRecognitionStatus = 'idle' | 'recording' | 'processing' | 'completed' | 'error';
 
 // 语音识别结果类型
 export interface SpeechRecognitionResult {

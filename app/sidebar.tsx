@@ -1,76 +1,50 @@
-import { Container } from 'components/Container'
-import UserInfo from 'components/UserInfo'
-import ChatHistory from 'components/ChatHistory'
-import { useRouter } from 'expo-router'
-import { View } from 'react-native'
+import { Container } from 'components/Container';
+import UserInfo from 'components/UserInfo';
+import ChatHistory from 'components/ChatHistory';
+import { useRouter, useFocusEffect } from 'expo-router';
+import { View, Text as RNText } from 'react-native';
+import { useState, useCallback } from 'react';
+import { ChatSessionStorage, ChatSession } from 'utils/chatSessionStorage';
 
 const Sidebar = () => {
   const router = useRouter();
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // 模拟用户数据
   const userData = {
     avatar: 'https://webp.kuaikuaitz.top/avatar_kk2.jpg', // 临时占位图
     name: 'KuaiKuai',
     id: '34567890',
-    tags: ['Tech Enthusiast', 'Cat', 'PM']
-  }
+    tags: ['AI Coding', 'PM', 'FE', 'React'],
+  };
 
-  // 模拟聊天历史数据
-  const chatSessions = [
-    {
-      id: '1',
-      title: '会被AI取代的工作有什么',
-      date: '2025-08-31',
-      colorIndex: 0
-    },
-    {
-      id: '2', 
-      title: 'The Stocks Lately',
-      date: '2025-08-19',
-      colorIndex: 1
-    },
-    {
-      id: '3',
-      title: 'Employment Situation', 
-      date: '2025-08-18',
-      colorIndex: 2
-    },
-    {
-      id: '4',
-      title: 'Hidden Histories',
-      date: '2025-08-17',
-      colorIndex: 3
-    },
-    {
-      id: '5',
-      title: 'Science of Happiness',
-      date: '2025-08-17',
-      colorIndex: 1
-    },
-    {
-      id: '6',
-      title: 'Future Hacks',
-      date: '2025-08-16',
-      colorIndex: 0
-    },
-    {
-      id: '7',
-      title: 'Creativity Unlocked',
-      date: '2025-08-15',
-      colorIndex: 2
-    },
-    {
-      id: '8',
-      title: 'Mindful Tech',
-      date: '2025-08-15',
-      colorIndex: 0
+  // 加载聊天会话数据
+  const loadChatSessions = useCallback(async () => {
+    try {
+      setLoading(true);
+      const sessions = await ChatSessionStorage.getSessions();
+      setChatSessions(sessions);
+    } catch (error) {
+      console.error('Failed to load chat sessions:', error);
+      // 如果加载失败，使用空数组
+      setChatSessions([]);
+    } finally {
+      setLoading(false);
     }
-  ]
+  }, []);
+
+  // 使用 useFocusEffect 来在页面获得焦点时重新加载数据
+  useFocusEffect(
+    useCallback(() => {
+      loadChatSessions();
+    }, [loadChatSessions])
+  );
 
   const handleSessionPress = (sessionId: string) => {
     // 处理会话点击
-    router.push(`/task/${sessionId}`)
-  }
+    router.push(`/task/${sessionId}`);
+  };
 
   return (
     <Container>
@@ -84,13 +58,35 @@ const Sidebar = () => {
         />
 
         {/* 历史会话区域 */}
-        <ChatHistory
-          sessions={chatSessions}
-          onSessionPress={handleSessionPress}
-        />
+        {loading ? (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <RNText
+              style={{
+                fontFamily: 'Montserrat',
+                fontSize: 16,
+                color: '#1E0F59',
+              }}>
+              加载中...
+            </RNText>
+          </View>
+        ) : chatSessions.length > 0 ? (
+          <ChatHistory sessions={chatSessions} onSessionPress={handleSessionPress} />
+        ) : (
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <RNText
+              style={{
+                fontFamily: 'Montserrat',
+                fontSize: 16,
+                color: '#1E0F59',
+                textAlign: 'center',
+              }}>
+              暂无聊天记录{'\n'}开始一段新的对话吧！
+            </RNText>
+          </View>
+        )}
       </View>
     </Container>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

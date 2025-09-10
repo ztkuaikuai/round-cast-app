@@ -3,15 +3,14 @@ import { Stack } from 'expo-router';
 
 export default function RootLayout() {
   return (
-    <Stack 
+    <Stack
       screenOptions={{
         headerShown: false,
         animation: 'slide_from_right',
-        animationDuration: 300
-      }}
-    >
-      <Stack.Screen 
-        name="sidebar" 
+        animationDuration: 300,
+      }}>
+      <Stack.Screen
+        name="sidebar"
         options={{
           presentation: 'card',
           animation: 'slide_from_left',
@@ -19,14 +18,14 @@ export default function RootLayout() {
           gestureEnabled: true,
           gestureDirection: 'horizontal',
           fullScreenGestureEnabled: true,
-          animationTypeForReplace: 'push'
+          animationTypeForReplace: 'push',
         }}
       />
-      <Stack.Screen 
-        name="home" 
+      <Stack.Screen
+        name="home"
         options={{
           animation: 'slide_from_right',
-          animationDuration: 300
+          animationDuration: 300,
         }}
       />
     </Stack>

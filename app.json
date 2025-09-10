@@ -13,10 +13,7 @@
       [
         "expo-font",
         {
-          "fonts": [
-            "./assets/Anton-Regular.ttf",
-            "./assets/Montserrat.ttf"
-          ]
+          "fonts": ["./assets/Anton-Regular.ttf", "./assets/Montserrat.ttf"]
         }
       ],
       "expo-router",
@@ -30,9 +27,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "scheme": "roundcast",
     "ios": {
       "supportsTablet": true,
@@ -48,9 +43,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.kuaikuaitz.roundcast",
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "extra": {
       "eas": {

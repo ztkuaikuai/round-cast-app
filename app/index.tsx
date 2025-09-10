@@ -1,12 +1,12 @@
-import { Container } from 'components/Container'
-import Hero from 'components/Hero'
+import { Container } from 'components/Container';
+import Hero from 'components/Hero';
 
 const LandingPage = () => {
   return (
     <Container>
-        <Hero />
+      <Hero />
     </Container>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

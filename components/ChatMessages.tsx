@@ -1,30 +1,30 @@
-import { View, Text, ScrollView, TouchableOpacity, Platform, Image, Animated } from 'react-native'
-import { useResponsive } from 'utils/responsive'
-import { useRouter } from 'expo-router'
-import { useRef, useEffect } from 'react'
-import Svg, { Circle, Polygon } from 'react-native-svg'
-import { getVibeImage } from 'utils/getVibeImage'
+import { View, Text, ScrollView, TouchableOpacity, Platform, Image, Animated } from 'react-native';
+import { useResponsive } from 'utils/responsive';
+import { useRouter } from 'expo-router';
+import { useRef, useEffect } from 'react';
+import Svg, { Circle, Polygon } from 'react-native-svg';
+import { getVibeImage } from 'utils/getVibeImage';
 
 interface ChatMessage {
-  id: string
-  type: 'user' | 'agent'
-  content: string
-  userQuery?: string
-  timestamp?: string
+  id: string;
+  type: 'user' | 'agent';
+  content: string;
+  userQuery?: string;
+  timestamp?: string;
   imageCard?: {
-    title?: string
-  }
+    title?: string;
+  };
 }
 
 interface ChatMessagesProps {
-  messages: ChatMessage[]
-  onImageCardPress?: (messageId: string) => void
-  scrollToBottom?: boolean
+  messages: ChatMessage[];
+  onImageCardPress?: (messageId: string) => void;
+  scrollToBottom?: boolean;
 }
 
 const ChatMessages = ({ messages, onImageCardPress, scrollToBottom }: ChatMessagesProps) => {
-  const { scale, verticalScale } = useResponsive()
-  const scrollViewRef = useRef<ScrollView>(null)
+  const { scale, verticalScale } = useResponsive();
+  const scrollViewRef = useRef<ScrollView>(null);
 
   // 当消息更新或需要滚动到底部时，自动滚动到底部
   useEffect(() => {
@@ -32,23 +32,23 @@ const ChatMessages = ({ messages, onImageCardPress, scrollToBottom }: ChatMessag
       // 使用两段式滚动实现更顺滑的效果
       // 第一次快速滚动到接近底部
       setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: false })
-      }, 50)
-      
+        scrollViewRef.current?.scrollToEnd({ animated: false });
+      }, 50);
+
       // 第二次平滑滚动到完全底部，确保完整显示
       setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true })
-      }, 150)
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+      }, 150);
     }
-  }, [messages.length, scrollToBottom])
+  }, [messages.length, scrollToBottom]);
 
   return (
     <ScrollView
       ref={scrollViewRef}
       style={{ flex: 1 }}
-      contentContainerStyle={{ 
-        paddingHorizontal: scale(18), 
-        paddingVertical: verticalScale(20) 
+      contentContainerStyle={{
+        paddingHorizontal: scale(18),
+        paddingVertical: verticalScale(20),
       }}
       showsVerticalScrollIndicator={false}
       // 优化滚动性能和体验的属性
@@ -59,35 +59,30 @@ const ChatMessages = ({ messages, onImageCardPress, scrollToBottom }: ChatMessag
       alwaysBounceVertical={false}
       maintainVisibleContentPosition={{
         minIndexForVisible: 0,
-        autoscrollToTopThreshold: 10
+        autoscrollToTopThreshold: 10,
       }}
       // 确保内容能够完整显示
-      contentInsetAdjustmentBehavior="automatic"
-    >
+      contentInsetAdjustmentBehavior="automatic">
       {messages.map((message) => (
-        <MessageBubble
-          key={message.id}
-          message={message}
-          onImageCardPress={onImageCardPress}
-        />
+        <MessageBubble key={message.id} message={message} onImageCardPress={onImageCardPress} />
       ))}
     </ScrollView>
-  )
-}
+  );
+};
 
 interface MessageBubbleProps {
-  message: ChatMessage
-  onImageCardPress?: (messageId: string) => void
+  message: ChatMessage;
+  onImageCardPress?: (messageId: string) => void;
 }
 
 const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
-  const { scale, verticalScale } = useResponsive()
-  const router = useRouter()
-  const isUser = message.type === 'user'
-  
+  const { scale, verticalScale } = useResponsive();
+  const router = useRouter();
+  const isUser = message.type === 'user';
+
   // 添加消息进入动画
-  const fadeAnim = useRef(new Animated.Value(0)).current
-  const slideAnim = useRef(new Animated.Value(30)).current
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
 
   useEffect(() => {
     // 消息出现时的动画效果
@@ -102,38 +97,36 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
         duration: 400,
         useNativeDriver: true,
       }),
-    ]).start()
-  }, [fadeAnim, slideAnim])
+    ]).start();
+  }, [fadeAnim, slideAnim]);
 
-  const getUserBubbleColor = () => '#D6DD18' // 绿黄色
+  const getUserBubbleColor = () => '#D6DD18'; // 绿黄色
   const getAgentBubbleColor = (index: number) => {
-    const colors = ['#FED25C', '#FD7416', '#01C4FF'] // 黄色、橙色、蓝色
-    return colors[index % colors.length]
-  }
+    const colors = ['#FED25C', '#FD7416', '#01C4FF']; // 黄色、橙色、蓝色
+    return colors[index % colors.length];
+  };
 
   // 处理图片点击，跳转到任务页面
   const handleImagePress = () => {
     router.push({
       pathname: '/task/[taskId]',
-      params: { taskId: message.id,  query: message.userQuery},
-    })
-  }
+      params: { taskId: message.id, query: message.userQuery },
+    });
+  };
 
   return (
-    <Animated.View 
-      style={{ 
+    <Animated.View
+      style={{
         marginBottom: verticalScale(16),
         opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }]
-      }}
-    >
+        transform: [{ translateY: slideAnim }],
+      }}>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: isUser ? 'flex-end' : 'flex-start',
-          alignItems: 'flex-start'
-        }}
-      >
+          alignItems: 'flex-start',
+        }}>
         {/* 消息气泡 */}
         <View
           style={{
@@ -142,8 +135,7 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
             paddingHorizontal: scale(16),
             paddingVertical: verticalScale(12),
             maxWidth: scale(273),
-          }}
-        >
+          }}>
           {/* 文字内容 */}
           <Text
             style={{
@@ -152,9 +144,8 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
               fontSize: scale(17),
               color: '#1E0F59',
               lineHeight: scale(21),
-              marginBottom: !isUser && message.imageCard ? verticalScale(12) : 0
-            }}
-          >
+              marginBottom: !isUser && message.imageCard ? verticalScale(12) : 0,
+            }}>
             {message.content}
           </Text>
 
@@ -174,18 +165,17 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
                   overflow: 'hidden',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  position: 'relative'
-                }}
-              >
+                  position: 'relative',
+                }}>
                 <Image
                   source={getVibeImage(message.id)}
                   style={{
                     width: '100%',
-                    height: '100%'
+                    height: '100%',
                   }}
                   resizeMode="cover"
                 />
-                
+
                 {/* 播放按钮覆盖层 */}
                 <View
                   style={{
@@ -200,14 +190,10 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.2,
                     shadowRadius: 4,
-                    elevation: 4
-                  }}
-                >
+                    elevation: 4,
+                  }}>
                   <Svg width={scale(40)} height={scale(40)} viewBox="0 0 40 40" fill="none">
-                    <Polygon
-                      points="12,10 32,20 12,30"
-                      fill="#FED25C"
-                    />
+                    <Polygon points="12,10 32,20 12,30" fill="#FED25C" />
                   </Svg>
                 </View>
               </TouchableOpacity>
@@ -221,9 +207,8 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
                     fontSize: scale(17),
                     color: '#1E0F59',
                     lineHeight: scale(21),
-                    textAlign: 'left'
-                  }}
-                >
+                    textAlign: 'left',
+                  }}>
                   {message.imageCard.title}
                 </Text>
               )}
@@ -232,7 +217,7 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
         </View>
       </View>
     </Animated.View>
-  )
-}
+  );
+};
 
-export default ChatMessages
+export default ChatMessages;

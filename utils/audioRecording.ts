@@ -31,7 +31,6 @@ export function useAudioRecording({
   maxDuration = 60000, // 默认 60 秒
   enableMetering = true,
 }: UseAudioRecordingProps = {}) {
-  
   const [recordingState, setRecordingState] = useState<AudioRecordingState>({
     isRecording: false,
     duration: 0,
@@ -39,36 +38,33 @@ export function useAudioRecording({
   });
 
   // 使用 expo-audio 的 hooks
-  const recorder = useAudioRecorder(
-    RecordingPresets.HIGH_QUALITY,
-    (status) => {
-      // 录音状态变化回调
-      console.log('Recording status:', status);
-      
-      // 如果 status 有时长信息，更新状态
-      // 注意：这里需要根据实际的 RecordingStatus 类型来访问属性
-      if ((status as any).durationMillis !== undefined) {
-        setRecordingState(prev => ({
-          ...prev,
-          duration: (status as any).durationMillis || 0,
-        }));
-      }
+  const recorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY, (status) => {
+    // 录音状态变化回调
+    console.log('Recording status:', status);
 
-      // 更新音量级别（如果支持）
-      if (enableMetering && (status as any).metering !== undefined) {
-        const normalizedLevel = Math.max(0, Math.min(1, ((status as any).metering + 60) / 60));
-        setRecordingState(prev => ({
-          ...prev,
-          audioLevels: [...prev.audioLevels.slice(-39), normalizedLevel],
-        }));
-      }
-
-      // 检查是否达到最大时长
-      if ((status as any).durationMillis && (status as any).durationMillis >= maxDuration) {
-        stopRecording();
-      }
+    // 如果 status 有时长信息，更新状态
+    // 注意：这里需要根据实际的 RecordingStatus 类型来访问属性
+    if ((status as any).durationMillis !== undefined) {
+      setRecordingState((prev) => ({
+        ...prev,
+        duration: (status as any).durationMillis || 0,
+      }));
     }
-  );
+
+    // 更新音量级别（如果支持）
+    if (enableMetering && (status as any).metering !== undefined) {
+      const normalizedLevel = Math.max(0, Math.min(1, ((status as any).metering + 60) / 60));
+      setRecordingState((prev) => ({
+        ...prev,
+        audioLevels: [...prev.audioLevels.slice(-39), normalizedLevel],
+      }));
+    }
+
+    // 检查是否达到最大时长
+    if ((status as any).durationMillis && (status as any).durationMillis >= maxDuration) {
+      stopRecording();
+    }
+  });
 
   const recorderState = useAudioRecorderState(recorder);
 
@@ -82,7 +78,7 @@ export function useAudioRecording({
         });
       } catch (error) {
         console.error('初始化音频会话失败:', error);
-        setRecordingState(prev => ({
+        setRecordingState((prev) => ({
           ...prev,
           error: '音频初始化失败',
         }));
@@ -95,7 +91,7 @@ export function useAudioRecording({
   // 生成模拟音量波动（当真实音量检测不可用时）
   const generateMockAudioLevels = useCallback(() => {
     const levels = Array.from({ length: 40 }, () => Math.random() * 0.8 + 0.2);
-    setRecordingState(prev => ({
+    setRecordingState((prev) => ({
       ...prev,
       audioLevels: levels,
     }));
@@ -105,14 +101,14 @@ export function useAudioRecording({
   const startRecording = useCallback(async () => {
     try {
       console.log('开始录音...');
-      
+
       // 检查权限
       const permission = await AudioModule.requestRecordingPermissionsAsync();
       if (!permission.granted) {
         const error = '录音权限被拒绝';
         console.error(error);
         onRecordingError?.(error);
-        setRecordingState(prev => ({
+        setRecordingState((prev) => ({
           ...prev,
           error,
         }));
@@ -122,8 +118,8 @@ export function useAudioRecording({
       // 准备并开始录音
       await recorder.prepareToRecordAsync();
       await recorder.record();
-      
-      setRecordingState(prev => ({
+
+      setRecordingState((prev) => ({
         ...prev,
         isRecording: true,
         duration: 0,
@@ -148,7 +144,7 @@ export function useAudioRecording({
       console.error('开始录音失败:', error);
       const errorMsg = `录音启动失败: ${error}`;
       onRecordingError?.(errorMsg);
-      setRecordingState(prev => ({
+      setRecordingState((prev) => ({
         ...prev,
         error: errorMsg,
       }));
@@ -160,7 +156,7 @@ export function useAudioRecording({
   const stopRecording = useCallback(async () => {
     try {
       console.log('停止录音...');
-      
+
       // 清理模拟音量定时器
       const mockInterval = (setRecordingState as any)._mockInterval;
       if (mockInterval) {
@@ -172,8 +168,8 @@ export function useAudioRecording({
       console.log('录音已停止');
 
       const finalDuration = recordingState.duration;
-      
-      setRecordingState(prev => ({
+
+      setRecordingState((prev) => ({
         ...prev,
         isRecording: false,
         audioLevels: [],
@@ -189,7 +185,7 @@ export function useAudioRecording({
         // 如果无法获取真实URI，返回错误
         const errorMsg = '无法获取录音文件路径';
         onRecordingError?.(errorMsg);
-        setRecordingState(prev => ({
+        setRecordingState((prev) => ({
           ...prev,
           error: errorMsg,
         }));
@@ -199,7 +195,7 @@ export function useAudioRecording({
       console.error('停止录音失败:', error);
       const errorMsg = `录音保存失败: ${error}`;
       onRecordingError?.(errorMsg);
-      setRecordingState(prev => ({
+      setRecordingState((prev) => ({
         ...prev,
         isRecording: false,
         error: errorMsg,
@@ -212,7 +208,7 @@ export function useAudioRecording({
   const cancelRecording = useCallback(async () => {
     try {
       console.log('取消录音...');
-      
+
       // 清理模拟音量定时器
       const mockInterval = (setRecordingState as any)._mockInterval;
       if (mockInterval) {
@@ -260,7 +256,7 @@ export function formatRecordingDuration(durationMs: number): string {
   const seconds = Math.floor(durationMs / 1000);
   const minutes = Math.floor(seconds / 60);
   const remainingSeconds = seconds % 60;
-  
+
   if (minutes > 0) {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   } else {

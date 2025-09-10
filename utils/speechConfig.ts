@@ -12,9 +12,9 @@ export const BAIDU_SPEECH_CONFIG: BaiduSpeechConfig = {
 // 配置验证
 export function validateBaiduConfig(): boolean {
   return !!(
-    BAIDU_SPEECH_CONFIG.apiKey && 
+    BAIDU_SPEECH_CONFIG.apiKey &&
     BAIDU_SPEECH_CONFIG.apiKey !== 'YOUR_BAIDU_API_KEY' &&
-    BAIDU_SPEECH_CONFIG.secretKey && 
+    BAIDU_SPEECH_CONFIG.secretKey &&
     BAIDU_SPEECH_CONFIG.secretKey !== 'YOUR_BAIDU_SECRET_KEY'
   );
 }
