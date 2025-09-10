@@ -38,7 +38,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.kuaikuaitz.roundcast",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMicrophoneUsageDescription": "This app needs access to microphone to record voice messages for speech-to-text conversion."
       }
     },
     "android": {
@@ -46,7 +47,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.kuaikuaitz.roundcast"
+      "package": "com.kuaikuaitz.roundcast",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "extra": {
       "eas": {

@@ -1,7 +1,11 @@
-import { View, Text, TouchableOpacity, Animated, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, Animated, TextInput, Alert } from "react-native";
 import Svg, { Circle, Rect, Path } from 'react-native-svg';
 import { useResponsive } from "utils/responsive";
 import { useState, useRef, useEffect } from 'react';
+import { useAudioRecording } from 'utils/audioRecording';
+import { initializeSpeechRecognition, recognizeSpeech } from 'utils/speechRecognition';
+import { BAIDU_SPEECH_CONFIG, validateBaiduConfig, getConfigStatus } from 'utils/speechConfig';
+import { SpeechRecognitionStatus } from 'utils/speechTypes';
 
 interface BottomInputButtonProps {
     onSendMessage?: (message: string) => void;
@@ -14,14 +18,25 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
     const [inputMode, setInputMode] = useState<'voice' | 'text'>('voice');
     const [inputText, setInputText] = useState('');
 
-    // 长按状态和音量波动效果
-    const [isPressing, setIsPressing] = useState(false);
+    // 语音识别状态
+    const [speechStatus, setSpeechStatus] = useState<SpeechRecognitionStatus>('idle');
+    
+    // 本地音量波动效果（作为视觉反馈）
     const [audioLevels, setAudioLevels] = useState<number[]>([]);
     const animationRef = useRef<NodeJS.Timeout | null>(null);
-
+    
     // 动画值
     const animationScale = useRef(new Animated.Value(0)).current; // 扩散动画的缩放值
     const backgroundOpacity = useRef(new Animated.Value(0)).current; // 背景透明度
+
+    // 初始化语音识别服务
+    useEffect(() => {
+        if (validateBaiduConfig()) {
+            initializeSpeechRecognition(BAIDU_SPEECH_CONFIG);
+        } else {
+            console.warn('百度语音识别配置未完成:', getConfigStatus());
+        }
+    }, []);
 
     // 生成随机音量波动数据
     const generateAudioLevels = () => {
@@ -34,7 +49,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
         generateAudioLevels();
         animationRef.current = setInterval(() => {
             generateAudioLevels();
-        }, 80); // 每16.6ms更新一次
+        }, 80); // 每80ms更新一次
     };
 
     // 停止音量波动动画
@@ -55,9 +70,75 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
         };
     }, []);
 
+    // 语音录制 Hook
+    const {
+        recordingState,
+        startRecording,
+        stopRecording,
+        cancelRecording,
+    } = useAudioRecording({
+        onRecordingComplete: async (audioUri, duration) => {
+            console.log('录音完成，开始识别...', { audioUri, duration });
+            setSpeechStatus('processing');
+            
+            if (!validateBaiduConfig()) {
+                Alert.alert('配置错误', getConfigStatus());
+                setSpeechStatus('error');
+                return;
+            }
+
+            try {
+                // 请求语音识别
+                const result = await recognizeSpeech(audioUri);
+                
+                if (result.status === 'completed' && result.text) {
+                    console.log('语音识别成功:', result.text);
+                    setSpeechStatus('completed');
+                    
+                    // 自动发送识别结果
+                    onSendMessage?.(result.text);
+                    
+                    // 重置状态
+                    setTimeout(() => {
+                        setSpeechStatus('idle');
+                    }, 1000);
+                } else {
+                    console.error('语音识别失败:', result.error);
+                    setSpeechStatus('error');
+                    Alert.alert('识别失败', result.error || '语音识别失败，请重试');
+                    
+                    setTimeout(() => {
+                        setSpeechStatus('idle');
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('语音识别异常:', error);
+                setSpeechStatus('error');
+                Alert.alert('识别异常', '语音识别服务异常，请重试');
+                
+                setTimeout(() => {
+                    setSpeechStatus('idle');
+                }, 2000);
+            }
+        },
+        onRecordingError: (error) => {
+            console.error('录音错误:', error);
+            setSpeechStatus('error');
+            Alert.alert('录音失败', error);
+            
+            setTimeout(() => {
+                setSpeechStatus('idle');
+            }, 2000);
+        },
+        maxDuration: 60000, // 最大60秒
+        enableMetering: true,
+    });
+
     // 长按开始
-    const handlePressIn = () => {
-        setIsPressing(true);
+    const handlePressIn = async () => {
+        if (speechStatus !== 'idle') return;
+        console.log('Hold to Speak - Press started');
+        // 开始音量波动动画
         startAudioAnimation();
 
         // 开始扩散动画 - 更快更顺滑
@@ -74,14 +155,26 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
             }),
         ]).start();
 
-        console.log('Hold to Speak - Press started');
+        setSpeechStatus('recording');
+        
+        const success = await startRecording();
+        if (!success) {
+            stopAudioAnimation();
+            setSpeechStatus('idle');
+            return;
+        }
+
     };
 
     // 长按结束
-    const handlePressOut = () => {
-        setIsPressing(false);
+    const handlePressOut = async () => {
+        if (speechStatus !== 'recording') return;
+        
+        console.log('Hold to Speak - Press ended');
+        
+        // 停止音量波动动画
         stopAudioAnimation();
-
+        
         // 收缩动画 - 更快
         Animated.parallel([
             Animated.timing(animationScale, {
@@ -95,8 +188,8 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                 useNativeDriver: false,
             }),
         ]).start();
-        onSendMessage?.("当下可能会被AI取代的工作有什么？如何避免不被取代呢？");
-        console.log('Hold to Speak - Press ended');
+        
+        await stopRecording();
     };
 
     // 处理发送消息
@@ -157,12 +250,13 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                                 height: '100%',
                                 zIndex: 1,
                             }}
-                            activeOpacity={1}
+                            activeOpacity={speechStatus === 'idle' ? 0.8 : 1}
+                            disabled={speechStatus !== 'idle'}
                             onPressIn={handlePressIn}
                             onPressOut={handlePressOut}
                         >
                             {/* 音量波动效果 */}
-                            {isPressing && audioLevels.length > 0 && (
+                            {speechStatus === 'recording' && audioLevels.length > 0 && (
                                 <Animated.View
                                     style={{
                                         position: 'absolute',
@@ -174,7 +268,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                                         opacity: animationScale,
                                     }}
                                 >
-                                    {audioLevels.map((level, index) => (
+                                    {audioLevels.map((level: number, index: number) => (
                                         <View
                                             key={index}
                                             style={{
@@ -189,12 +283,12 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                                 </Animated.View>
                             )}
 
-                            {/* Hold to Speak 文字 - 只在未按住时显示 */}
+                            {/* 状态文字 */}
                             <Animated.View
                                 style={{
                                     opacity: animationScale.interpolate({
                                         inputRange: [0, 1],
-                                        outputRange: [1, 0],
+                                        outputRange: [1, speechStatus === 'recording' ? 0 : 1],
                                     }),
                                     justifyContent: 'center',
                                     alignItems: 'center',
@@ -205,12 +299,15 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
                                     className="text-[#1E0F59] text-center"
                                     style={{
                                         fontFamily: "Anton-Regular",
-                                        fontSize: scale(28),
+                                        fontSize: scale(speechStatus === 'processing' ? 20 : 28),
                                         lineHeight: verticalScale(42),
                                         textAlignVertical: 'center',
                                     }}
                                 >
-                                    Hold to Speak
+                                    {speechStatus === 'idle' && 'Hold to Speak'}
+                                    {speechStatus === 'processing' && 'Processing...'}
+                                    {speechStatus === 'completed' && 'Done!'}
+                                    {speechStatus === 'error' && 'Error'}
                                 </Text>
                             </Animated.View>
                         </TouchableOpacity>
