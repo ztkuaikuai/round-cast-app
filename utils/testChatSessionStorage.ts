@@ -29,7 +29,7 @@ export const testChatSessionStorage = async () => {
     const remainingSessions = await ChatSessionStorage.getSessions();
     console.log('✅ 删除会话成功，剩余', remainingSessions.length, '个会话');
 
-    console.log('🎉 所有测试通过！');
+    console.log('🎉 所有测试通过！！');
   } catch (error) {
     console.error('❌ 测试失败:', error);
   }
