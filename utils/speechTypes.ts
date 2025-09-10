@@ -39,13 +39,13 @@ export const DEFAULT_SPEECH_CONFIG: Required<Omit<SpeechRecognitionOptions, 'tok
   channel: 1,
   cuid: 'round-cast-app',
   lan: 'zh',
-  dev_pid: 1537, // 普通话(支持简单的英文识别)
+  dev_pid: 80001, // 极速版输入法模型
 };
 
 // API 端点
 export const BAIDU_API_ENDPOINTS = {
   token: 'https://aip.baidubce.com/oauth/2.0/token',
-  speech: 'https://vop.baidu.com/server_api',
+  speech: 'https://vop.baidu.com/pro_api',
 } as const;
 
 // 错误码映射
