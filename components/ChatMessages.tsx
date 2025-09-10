@@ -9,6 +9,7 @@ interface ChatMessage {
   id: string
   type: 'user' | 'agent'
   content: string
+  userQuery?: string
   timestamp?: string
   imageCard?: {
     title?: string
@@ -114,7 +115,7 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
   const handleImagePress = () => {
     router.push({
       pathname: '/task/[taskId]',
-      params: { taskId: message.id }
+      params: { taskId: message.id,  query: message.userQuery},
     })
   }
 

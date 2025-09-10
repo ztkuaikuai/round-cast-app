@@ -20,9 +20,9 @@ interface Message {
 }
 
 const Task = () => {
-    const { taskId } = useLocalSearchParams()
-    console.log("🚀 ~ Task ~ taskId:", taskId)
-    
+    const { taskId, query } = useLocalSearchParams()
+    console.log("🚀 ~ Task ~ taskId:", taskId, "query:", query)
+
     // 初始化消息状态
     const [messages, setMessages] = useState<Message[]>([{
     id: '1',
@@ -99,8 +99,8 @@ const Task = () => {
         <Container>
             <View className="flex-1">
                 {/* 顶部标题区域 */}
-                <TaskHeader title="会被 AI 取代的工作有什么" />
-                
+                <TaskHeader title={Array.isArray(query) ? query.join(', ') : query} />
+
                 {/* 展示区域 */}
                 <MediaDisplay
                     imageSource={getVibeImage(taskId as string)}

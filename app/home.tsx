@@ -11,6 +11,7 @@ interface ChatMessage {
   id: string
   type: 'user' | 'agent'
   content: string
+  userQuery?: string
   timestamp?: string
   imageCard?: {
     title?: string
@@ -27,27 +28,81 @@ const Home = () => {
   // 模拟 Agent 响应的假数据
   const mockAgentResponses = [
     {
-      id: 1,
-      content: "来了哦~请点击下方进入播客内容",
+      content: "来了哦～",
       imageCard: {
-        title: "好久不见，筷筷～加入我们的对话吧！"
+        title: "好久不见，加入我们的对话吧！"
       }
     },
     {
-      id: 2,
-      content: "The podcast has been generated. Click to listen to the information you want.",
+      content: "这是个很好的问题！我们一起讨论一下。",
       imageCard: {
       }
     },
     {
-      id: 3,
-      content: "How are the stocks lately",
+      content: "让我想想...这个话题确实很有意思，我们来一起分析一下。",
       imageCard: {
       }
     },
     {
-      id: 4,
-      content: "The news about multiagent",
+      content: "脑爆环节到！来加入我们！",
+      imageCard: {
+      }
+    },
+    {
+      content: "哇，这个观点太棒了！圆桌上的朋友们怎么看？",
+      imageCard: {
+        title: "来参与不同视角的碰撞"
+      }
+    },
+    {
+      content: "说到这里，我想到了一个有趣的案例...",
+      imageCard: {
+      }
+    },
+    {
+      content: "等等等等，这里有个细节值得我们仔细聊聊！",
+      imageCard: {
+      }
+    },
+    {
+      content: "圆桌时间！大家各抒己见吧～",
+      imageCard: {
+        title: "这个观点真有趣，大家怎么看？"
+      }
+    },
+    {
+      content: "这个话题让我想起了最近的热门讨论，我们展开聊聊？",
+      imageCard: {
+      }
+    },
+    {
+      content: "有意思有意思！不如我们从另一个角度来看看这个问题。",
+      imageCard: {
+      }
+    },
+    {
+      content: "慢着慢着，让我们深挖一下这个点...",
+      imageCard: {
+      }
+    },
+    {
+      content: "欸，这个话题正好是我们上次讨论的延续呢！",
+      imageCard: {
+      }
+    },
+    {
+      content: "圆桌围坐，思维碰撞！这就是我们想要的氛围～",
+      imageCard: {
+        title: "思维的盛宴，观点的交融"
+      }
+    },
+    {
+      content: "说得好！让我补充一个不同的视角...",
+      imageCard: {
+      }
+    },
+    {
+      content: "这个问题太棒了，正好可以引发一场精彩的圆桌辩论！",
       imageCard: {
       }
     }
@@ -75,11 +130,12 @@ const Home = () => {
       const mockResponse = mockAgentResponses[responseIndex];
       
       const agentMessage: ChatMessage = {
-        id: mockResponse.id.toString(),
+        id: Date.now().toString(), // TODO))前端需要维护一个唯一id
         type: 'agent',
         content: mockResponse.content,
+        userQuery: message,
         timestamp: new Date().toISOString(),
-        imageCard: mockResponse.imageCard
+        imageCard: mockResponse.imageCard,
       };
       
       setMessages(prev => [...prev, agentMessage]);
