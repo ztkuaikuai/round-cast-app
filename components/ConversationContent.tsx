@@ -6,9 +6,10 @@ import { Message } from 'api/task';
 
 interface ConversationContentProps {
   messages: Message[];
+  updateVisibleMessageIndex: (index: number) => void;
 }
 
-const ConversationContent = ({ messages }: ConversationContentProps) => {
+const ConversationContent = ({ messages, updateVisibleMessageIndex }: ConversationContentProps) => {
   const { scale, verticalScale } = useResponsive();
   const scrollViewRef = useRef<ScrollView>(null);
 
