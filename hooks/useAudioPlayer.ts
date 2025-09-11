@@ -142,16 +142,11 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
             .map(message => message.url!.trim());
 
         if (urls.length > 0) {
-            setState(prev => {
-                // 去重
-                const uniqueUrls = new Set([...prev.queue, ...urls]);
-                console.log("🚀 ~ useAudioPlayer ~ uniqueUrls:", uniqueUrls)
-                return {
-                    ...prev,
-                    queue: Array.from(uniqueUrls),
-                    error: null
-                }
-            });
+            setState(prev => ({
+                ...prev,
+                queue: [...prev.queue, ...urls],
+                error: null
+            }));
         }
     }, []);
 

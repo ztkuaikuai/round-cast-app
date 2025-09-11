@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Container } from '../../../components/Container';
 import TaskHeader from '../../../components/TaskHeader';
 import MediaDisplay from '../../../components/MediaDisplay';
@@ -64,13 +64,6 @@ const Task = () => {
       // 更新任务状态
       setTaskStatus(response.status);
 
-      console.log(
-        '🚀 ~ fetchTaskConversation ~ status:',
-        response.status,
-        'messages count:',
-        response.context.length
-      );
-
       // 如果任务仍在进行中，继续获取
       if (response.status === 1) {
         // 递归获取下一条消息
@@ -92,11 +85,35 @@ const Task = () => {
     }
   }, [taskId]);
 
+  const prevMessagesRef = useRef<Message[]>([]);
   useEffect(() => {
     // 消息更新，推送语音信息
     if (messages.length > 0) {
-      console.log('Messages updated, total count:', messages.length);
-      enqueueMultiple(messages);
+      // 使用ref获取prevMessages，和最新的messages对比，通过从后向前比较chunk_id，找出新增的消息
+      const prevMessages = prevMessagesRef.current;
+      // 从后向前找到与prevMessages最后一项chunk_id相同的索引
+      let newMessages: Message[] = [];
+      if (prevMessages.length > 0) {
+        const lastPrevChunkId = prevMessages[prevMessages.length - 1].chunk_id;
+        const lastMatchIndex = messages.findLastIndex(msg => msg.chunk_id === lastPrevChunkId);
+        
+        if (lastMatchIndex !== -1) {
+          // 截取匹配索引之后的所有消息作为新消息
+          newMessages = messages.slice(lastMatchIndex + 1);
+        } else {
+          // 如果没有找到匹配项，说明所有消息都是新的
+          newMessages = messages;
+        }
+      } else {
+        // 如果之前没有消息，所有消息都是新的
+        newMessages = messages;
+      }
+
+      if (newMessages.length > 0) {
+        enqueueMultiple(newMessages);
+      }
+
+      prevMessagesRef.current = messages;
     }
   }, [messages.length]);
 
