@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import { View } from 'react-native';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Container } from '../../../components/Container';
 import TaskHeader from '../../../components/TaskHeader';
 import MediaDisplay from '../../../components/MediaDisplay';
@@ -18,7 +18,6 @@ import { useAudioPlayer } from 'hooks';
 
 const Task = () => {
   const { taskId, topic, from } = useLocalSearchParams();
-  console.log("🚀 ~ Task ~ from:", from)
   const [isPlaying, setIsPlaying] = useState(true);
 
   // 初始化消息状态
@@ -27,6 +26,9 @@ const Task = () => {
   const [taskStatus, setTaskStatus] = useState<1 | 0>(1); // 1-进行中, 0-已完成
   // 是否正在获取对话
   const [isLoading, setIsLoading] = useState(false);
+  // 使用 ref 来解决闭包问题
+  const shouldStopPollingRef = useRef(false);
+  
   // 用户正看到的消息索引
   const [visibleMessageIndex, setVisibleMessageIndex] = useState(-1);
   const updateVisibleMessageIndex = (index: number) => {
@@ -48,8 +50,11 @@ const Task = () => {
   } = useAudioPlayer();
 
   // 获取任务对话信息
-  const fetchTaskConversation = async (currentMessages: Message[] = []) => {
-    if (isLoading) return; // 防止重复请求
+  const fetchTaskConversation = useCallback(async (currentMessages: Message[] = []) => {
+    if (isLoading || shouldStopPollingRef.current) {
+      console.log('Skipping fetch:', { isLoading, shouldStopPolling: shouldStopPollingRef.current });
+      return; // 防止重复请求和语音输入时停止轮询
+    }
 
     setIsLoading(true);
     try {
@@ -71,11 +76,15 @@ const Task = () => {
       // 更新任务状态
       setTaskStatus(response.status);
 
-      // 如果任务仍在进行中，继续获取
+      // 如果任务仍在进行中且没有被停止轮询，继续获取
       if (response.status === 1) {
-        // 递归获取下一条消息
+        // 递归获取下一条消息，使用 setTimeout 并检查最新的 ref 值
         setTimeout(() => {
-          fetchTaskConversation(response.context);
+          if (!shouldStopPollingRef.current) {
+            fetchTaskConversation(response.context);
+          } else {
+            console.log('Polling stopped due to voice input');
+          }
         }, 500);
       }
     } catch (error) {
@@ -83,7 +92,7 @@ const Task = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [taskId, topic, from, isLoading]);
 
   // 组件挂载时开始获取对话信息
   useEffect(() => {
@@ -126,12 +135,28 @@ const Task = () => {
 
   const handleSendMessage = (message: string) => {
     console.log('Sending message:', message);
+    // 重新启用轮询（无论是语音还是文字输入）
+    shouldStopPollingRef.current = false;
+
+    // TODO))追加用户信息
+    const userMessage: Message = {
+      chunk_id: messages.length + 1,
+      speaker_name: 'user',
+      content: message,
+      url: '',
+    };
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    // 发送用户消息后继续获取任务对话
+    fetchTaskConversation(updatedMessages);
+    setTimeout(() => {
+      play(); // 继续播放队列中的音频
+    }, 500);
   };
 
   const handlePlayPause = () => {
     console.log('Play/Pause media');
     setIsPlaying((prev) => !prev);
-    // TODO)) 处理播放/暂停逻辑
     if (!isPlaying) {
       // 播放逻辑
       play();
@@ -147,6 +172,17 @@ const Task = () => {
       play();
     }, 500);
   }, []);
+
+  const handlePressIn = () => {
+    // 按下逻辑 - 语音输入开始，停止轮询
+    console.log('Voice input started - stopping polling');
+    shouldStopPollingRef.current = true;
+    clearQueue();
+  }
+
+  const handlePressOut = () => {
+    
+  }
 
   return (
     <Container>
@@ -174,7 +210,7 @@ const Task = () => {
         />
 
         {/* 底部输入按钮 */}
-        <BottomInputButton onSendMessage={handleSendMessage} />
+        <BottomInputButton onSendMessage={handleSendMessage} onHandlePressIn={handlePressIn} onHandlePressOut={handlePressOut} />
       </View>
     </Container>
   );

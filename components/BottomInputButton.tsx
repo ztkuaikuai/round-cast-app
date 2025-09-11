@@ -9,9 +9,11 @@ import { SpeechRecognitionStatus } from 'utils/speechTypes';
 
 interface BottomInputButtonProps {
   onSendMessage?: (message: string) => void;
+  onHandlePressIn?: () => void;
+  onHandlePressOut?: () => void;
 }
 
-const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
+const BottomInputButton = ({ onSendMessage, onHandlePressIn, onHandlePressOut }: BottomInputButtonProps) => {
   const { scale, verticalScale } = useResponsive();
 
   // 底部按钮模式状态：'voice' | 'text'
@@ -133,6 +135,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
   const handlePressIn = async () => {
     if (speechStatus !== 'idle') return;
     console.log('Hold to Speak - Press started');
+    onHandlePressIn?.();
     // 开始音量波动动画
     startAudioAnimation();
 
@@ -184,6 +187,7 @@ const BottomInputButton = ({ onSendMessage }: BottomInputButtonProps) => {
     ]).start();
 
     await stopRecording();
+    onHandlePressOut?.();
   };
 
   // 处理发送消息
