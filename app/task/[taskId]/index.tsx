@@ -12,11 +12,13 @@ import {
   type TaskRequest,
   type TaskResponse,
   type Message,
+  getHistoryConversation,
 } from '../../../api/task';
 import { useAudioPlayer } from 'hooks';
 
 const Task = () => {
-  const { taskId, topic } = useLocalSearchParams();
+  const { taskId, topic, from } = useLocalSearchParams();
+  console.log("🚀 ~ Task ~ from:", from)
   const [isPlaying, setIsPlaying] = useState(true);
 
   // 初始化消息状态
@@ -57,7 +59,12 @@ const Task = () => {
         context: currentMessages,
       };
 
-      const response: TaskResponse = await getTaskConversation(params);
+      let response: TaskResponse | null = null;
+      if (from === 'sidebar') {
+        response = await getHistoryConversation(taskId as string);
+      } else {
+        response = await getTaskConversation(params);
+      }
 
       // 更新消息列表
       setMessages(response.context);
