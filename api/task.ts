@@ -25,7 +25,7 @@ export interface TaskResponse {
 // 模拟获取任务对话信息的接口
 export async function getTaskConversation(params: TaskRequest): Promise<TaskResponse> {
   // 模拟网络延迟
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
   const { task_id, topic, context } = params;
 
