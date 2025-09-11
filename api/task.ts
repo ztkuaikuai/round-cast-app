@@ -56,6 +56,18 @@ export async function getTaskConversation(params: TaskRequest): Promise<TaskResp
   };
 }
 
+// 模拟获取任务对话信息的接口
+export async function getHistoryConversation(taskId: TaskRequest['task_id']): Promise<TaskResponse> {
+  // 模拟网络延迟
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  return {
+    task_id: taskId,
+    status: 0,
+    context: messageMock,
+  };
+}
+
 // 模拟发送用户消息的接口
 export async function sendUserMessage(
   task_id: string,
