@@ -110,7 +110,7 @@ const MessageBubble = ({ message, onImageCardPress }: MessageBubbleProps) => {
   const handleImagePress = () => {
     router.push({
       pathname: '/task/[taskId]',
-      params: { taskId: message.id, query: message.userQuery },
+      params: { taskId: message.id, topic: message.userQuery },
     });
   };
 

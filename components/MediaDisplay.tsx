@@ -4,20 +4,16 @@ import { useResponsive } from 'utils/responsive';
 import { useState } from 'react';
 
 interface MediaDisplayProps {
-  imageSource?: any; // 图片源，可以是 require() 或 uri
-  isPlaying?: boolean;
-  onPlayPause?: () => void;
+  imageSource: any; // 图片源，可以是 require() 或 uri
+  isPlaying: boolean;
+  onPlayPause: () => void;
 }
 
-const MediaDisplay = ({ imageSource, isPlaying = true, onPlayPause }: MediaDisplayProps) => {
+const MediaDisplay = ({ imageSource, isPlaying, onPlayPause }: MediaDisplayProps) => {
   const { scale, verticalScale } = useResponsive();
-  const [localIsPlaying, setLocalIsPlaying] = useState(isPlaying);
 
   const handlePlayPress = () => {
-    const newPlayingState = !localIsPlaying;
-    setLocalIsPlaying(newPlayingState);
-    onPlayPause?.();
-    console.log(newPlayingState ? 'Play' : 'Pause');
+    onPlayPause();
   };
 
   // 如果没有提供图片源，使用默认的占位符背景色
@@ -59,7 +55,7 @@ const MediaDisplay = ({ imageSource, isPlaying = true, onPlayPause }: MediaDispl
                 {/* 播放按钮背景圆 */}
                 <Circle cx="30" cy="30" r="30" fill="#2972F1" />
                 {/* 播放/暂停图标 */}
-                {localIsPlaying ? (
+                {isPlaying ? (
                   // 暂停图标 (两个矩形)
                   <>
                     <Rect x="22" y="18" width="4" height="24" fill="#FED25C" rx="2" />

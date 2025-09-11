@@ -2,7 +2,7 @@ import { View, Text, ScrollView, Platform } from 'react-native';
 import { useRef, useEffect } from 'react';
 import { useResponsive } from 'utils/responsive';
 import LoadingAnimation from 'components/LoadingAnimation';
-import type { Message } from 'app/task/[taskId]';
+import { Message } from 'api/task';
 
 interface ConversationContentProps {
   messages: Message[];

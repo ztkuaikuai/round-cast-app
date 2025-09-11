@@ -45,7 +45,7 @@ const Sidebar = () => {
     // 处理会话点击
     router.push({
       pathname: '/task/[taskId]',
-      params: { taskId: sessionId, query: title },
+      params: { taskId: sessionId, topic: title },
     });
   };
 
