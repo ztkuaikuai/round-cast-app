@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, Platform } from 'react-native';
 import { useRef, useEffect } from 'react';
 import { useResponsive } from 'utils/responsive';
+import LoadingAnimation from 'components/LoadingAnimation';
 import type { Message } from 'app/task/[taskId]';
 
 interface ConversationContentProps {
@@ -40,6 +41,19 @@ const ConversationContent = ({ messages }: ConversationContentProps) => {
 
     return baseStyle;
   };
+
+  // 当消息长度为0时，显示加载动画
+  if (messages.length === 0) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          marginTop: verticalScale(20),
+        }}>
+        <LoadingAnimation />
+      </View>
+    );
+  }
 
   return (
     <View
