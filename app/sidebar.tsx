@@ -82,6 +82,7 @@ const Sidebar = () => {
                 fontSize: 16,
                 color: '#1E0F59',
                 textAlign: 'center',
+                fontWeight: '700',
               }}>
               暂无聊天记录{'\n'}开始一段新的对话吧！
             </RNText>

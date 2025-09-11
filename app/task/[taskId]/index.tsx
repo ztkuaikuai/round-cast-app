@@ -13,11 +13,11 @@ import {
   type TaskResponse,
   type Message,
 } from '../../../api/task';
+import { useAudioPlayer } from 'hooks';
 
 const Task = () => {
   const { taskId, topic } = useLocalSearchParams();
-  console.log('🚀 ~ Task ~ taskId:', taskId, 'topic:', topic);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
   // 初始化消息状态
   const [messages, setMessages] = useState<Message[]>([]);
@@ -32,6 +32,18 @@ const Task = () => {
       setVisibleMessageIndex(index);
     }
   };
+  const {
+    isPlaying: isAudioPlaying,
+    isLoading: isAudioLoading,
+    queue,
+    error,
+    play,
+    pause,
+    enqueue,
+    enqueueMultiple,
+    clearQueue,
+    getCurrentUrl
+  } = useAudioPlayer();
 
   // 获取任务对话信息
   const fetchTaskConversation = async (currentMessages: Message[] = []) => {
@@ -80,6 +92,14 @@ const Task = () => {
     }
   }, [taskId]);
 
+  useEffect(() => {
+    // 消息更新，推送语音信息
+    if (messages.length > 0) {
+      console.log('Messages updated, total count:', messages.length);
+      enqueueMultiple(messages);
+    }
+  }, [messages.length]);
+
   const handleSendMessage = (message: string) => {
     console.log('Sending message:', message);
   };
@@ -90,10 +110,19 @@ const Task = () => {
     // TODO)) 处理播放/暂停逻辑
     if (!isPlaying) {
       // 播放逻辑
+      play();
     } else {
       // 暂停播放逻辑
+      pause();
     }
   };
+
+  useEffect(() => {
+    // 组件挂载，自动播放
+    setTimeout(() => {
+      play();
+    }, 500);
+  }, []);
 
   return (
     <Container>

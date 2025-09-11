@@ -11,7 +11,7 @@ interface ChatSession {
 
 interface ChatHistoryProps {
   sessions: ChatSession[];
-  onSessionPress?: (sessionId: string) => void;
+  onSessionPress?: (sessionId: string, title: string) => void;
 }
 
 const ChatHistory = ({ sessions, onSessionPress }: ChatHistoryProps) => {
