@@ -26,7 +26,7 @@ const ChatHistory = ({ sessions, onSessionPress }: ChatHistoryProps) => {
           <ChatSessionItem
             key={session.id}
             session={session}
-            onPress={() => onSessionPress?.(session.id)}
+            onPress={() => onSessionPress?.(session.id, session.title)}
           />
         ))}
       </ScrollView>

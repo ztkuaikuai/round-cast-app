@@ -41,9 +41,12 @@ const Sidebar = () => {
     }, [loadChatSessions])
   );
 
-  const handleSessionPress = (sessionId: string) => {
+  const handleSessionPress = (sessionId: string, title: string) => {
     // 处理会话点击
-    router.push(`/task/${sessionId}`);
+    router.push({
+      pathname: '/task/[taskId]',
+      params: { taskId: sessionId, query: title },
+    });
   };
 
   return (
