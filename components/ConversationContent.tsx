@@ -1,17 +1,7 @@
 import { View, Text, ScrollView, Platform } from 'react-native';
 import { useRef, useEffect } from 'react';
 import { useResponsive } from 'utils/responsive';
-
-interface Speaker {
-  name: string;
-  role: 'host' | 'expert' | 'user';
-}
-
-interface Message {
-  id: string;
-  speaker: Speaker;
-  content: string;
-}
+import type { Message } from 'app/task/[taskId]';
 
 interface ConversationContentProps {
   messages: Message[];
@@ -31,11 +21,11 @@ const ConversationContent = ({ messages }: ConversationContentProps) => {
     }
   }, [messages]);
 
-  const getSpeakerDisplayName = (speaker: Speaker) => {
-    if (speaker.role === 'user') {
+  const getSpeakerDisplayName = (speaker: Message['speaker_name']) => {
+    if (speaker === 'user') {
       return 'You:';
     }
-    return `${speaker.name}:`;
+    return `${speaker}:`;
   };
 
   const getSpeakerStyle = (role: string) => {
@@ -67,23 +57,23 @@ const ConversationContent = ({ messages }: ConversationContentProps) => {
           paddingBottom: verticalScale(20),
         }}
         showsVerticalScrollIndicator={false}>
-        {messages.map((message, index) => (
-          <View key={message.id} style={{ marginBottom: verticalScale(20) }}>
+        {messages.map((message) => (
+          <View key={message.chunk_id} style={{ marginBottom: verticalScale(20) }}>
             {/* 说话人名称 */}
             <Text
               style={{
-                ...getSpeakerStyle(message.speaker.role),
+                ...getSpeakerStyle(message.speaker_name),
                 fontFamily: '',
                 fontWeight: Platform.OS === 'ios' ? ('700' as const) : ('900' as const),
                 marginBottom: verticalScale(4),
               }}>
-              {getSpeakerDisplayName(message.speaker)}
+              {getSpeakerDisplayName(message.speaker_name)}
             </Text>
 
             {/* 消息内容 */}
             <Text
               style={{
-                ...getSpeakerStyle(message.speaker.role),
+                ...getSpeakerStyle(message.speaker_name),
               }}>
               {message.content}
             </Text>
