@@ -25,7 +25,7 @@ export interface TaskResponse {
 // 获取任务对话信息
 export async function getTaskConversation(params: TaskRequest, signal?: AbortSignal): Promise<TaskResponse> {
   try {
-    console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ params:", params)
+    // console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ params:", params)
     const response = await fetch('http://10.143.161.42:8111/generate', {
       method: 'POST',
       headers: {
@@ -35,7 +35,7 @@ export async function getTaskConversation(params: TaskRequest, signal?: AbortSig
       body: JSON.stringify(params),
       signal, // 添加 AbortSignal 支持
     });
-    console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ response:", response)
+    // console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ response:", response)
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -44,7 +44,7 @@ export async function getTaskConversation(params: TaskRequest, signal?: AbortSig
     const data: TaskResponse = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching task conversation:', error);
+    console.log('Error fetching task conversation:', error);
     // 发生错误时返回错误状态
     throw new Error(`Failed to fetch task conversation: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
