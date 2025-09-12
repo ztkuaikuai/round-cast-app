@@ -6,6 +6,7 @@ export interface Message {
   speaker_name: string;
   content: string;
   voice_id?: string;
+  isHistory?: boolean; // 可选字段，标识是否为历史消息
 }
 
 // 任务请求参数
@@ -41,7 +42,7 @@ export async function getTaskConversation(params: TaskRequest, signal?: AbortSig
     }
     
     const data: TaskResponse = await response.json();
-    console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ data:", data.status, 'task_id', data.task_id, 'contextLength', data.context.length, '最后一个', data.context.at(-1));
+    console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ data.status:", data.status, 'task_id', data.task_id, 'contextLength', data.context.length, '最后一个', data.context.at(-1));
     return data;
   } catch (error) {
     console.log('Error fetching task conversation:', error);

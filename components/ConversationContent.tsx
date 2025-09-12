@@ -2,10 +2,12 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { View, Text, ScrollView, Platform } from 'react-native';
 import { useResponsive } from 'utils/responsive';
 import LoadingAnimation from 'components/LoadingAnimation';
+import WaitingForContentAnimation from 'components/WaitingForContentAnimation';
 import { Message } from 'api/task';
 
 interface ConversationContentProps {
   messages: Message[];
+  taskStatus: 1 | 0; // 1-进行中, 0-已完成
 }
 
 // TypewriterText 组件 - 处理单个消息的打字机效果
@@ -13,10 +15,11 @@ interface TypewriterTextProps {
   text: string;
   style: any;
   isActive: boolean;
+  isHistory?: boolean; // 可选字段，标识是否为历史消息
   onComplete?: () => void;
 }
 
-const TypewriterText = React.memo(({ text, style, isActive, onComplete }: TypewriterTextProps) => {
+const TypewriterText = React.memo(({ text, style, isActive, isHistory, onComplete }: TypewriterTextProps) => {
   const [displayedText, setDisplayedText] = useState('');
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -43,7 +46,7 @@ const TypewriterText = React.memo(({ text, style, isActive, onComplete }: Typewr
 
   // 打字机动画逻辑
   useEffect(() => {
-    if (!isActive) {
+    if (!isActive || isHistory) {
       // 如果不是激活状态，直接显示完整文本
       completeTypewriter();
       return;
@@ -90,12 +93,14 @@ const TypewriterText = React.memo(({ text, style, isActive, onComplete }: Typewr
   );
 });
 
-const ConversationContent = ({ messages }: ConversationContentProps) => {
+const ConversationContent = ({ messages, taskStatus }: ConversationContentProps) => {
   const { scale, verticalScale } = useResponsive();
   const scrollViewRef = useRef<ScrollView>(null);
   
   // 打字机状态管理
   const [activeTypingMessageId, setActiveTypingMessageId] = useState<number | null>(null);
+  // 追踪打字机是否完成
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
 
   // 当消息更新时，处理打字机效果和自动滚动
   useEffect(() => {
@@ -104,6 +109,8 @@ const ConversationContent = ({ messages }: ConversationContentProps) => {
       
       // 激活最后一条消息的打字机效果
       setActiveTypingMessageId(lastMessage.chunk_id);
+      // 重置打字机完成状态
+      setIsTypingComplete(false);
       
       // 延迟执行确保内容已渲染
       setTimeout(() => {
@@ -114,6 +121,9 @@ const ConversationContent = ({ messages }: ConversationContentProps) => {
 
   // 处理打字机完成回调
   const handleTypingComplete = useCallback(() => {
+    // 标记打字机完成
+    setIsTypingComplete(true);
+    
     // 打字机完成后再次滚动到底部，确保完整内容可见
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
@@ -191,11 +201,17 @@ const ConversationContent = ({ messages }: ConversationContentProps) => {
                 text={message.content}
                 style={getSpeakerStyle(message.speaker_name)}
                 isActive={isLastMessage && isTypingActive}
+                isHistory={message.isHistory}
                 onComplete={handleTypingComplete}
               />
             </View>
           );
         })}
+
+        {/* 当任务状态为进行中且打字机完成时显示等待动画 */}
+        {taskStatus === 1 && isTypingComplete && messages.length > 0 && (
+          <WaitingForContentAnimation />
+        )}
       </ScrollView>
     </View>
   );

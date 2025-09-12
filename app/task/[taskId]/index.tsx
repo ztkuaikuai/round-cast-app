@@ -112,6 +112,15 @@ const Task = () => {
         }, 500);
       }
 
+      if (next) {
+        shouldStopPollingRef.current = false; // 重置停止轮询标志
+        // 打断后一段时间从打断地方进行播放
+        createTrackedTimeout(() => {
+          setIsPlaying(true);
+          play();
+        }, 500);
+      }
+
       // 如果任务仍在进行中且没有被停止轮询，继续获取
       if (response.status === 1 && !abortController.signal.aborted) {
         // 递归获取下一条消息，使用 createTrackedTimeout 并检查最新的 ref 值
@@ -146,6 +155,8 @@ const Task = () => {
         try {
           const data = await getHistoryConversation(taskId as string);
           if (data && data.context) {
+            // 处理历史消息，标记为历史
+            data.context = data.context.map(msg => ({ ...msg, isHistory: true }));
             setMessages(data.context);
             setTaskStatus(data.status);
           }
@@ -165,7 +176,7 @@ const Task = () => {
       }
     }
     getTask();
-  }, [taskId, from, fetchTaskConversation, createTrackedTimeout, play]);
+  }, [taskId]);
 
   const prevMessagesRef = useRef<Message[]>([]);
   useEffect(() => {
@@ -201,6 +212,9 @@ const Task = () => {
 
   const handleSendMessage = (message: string) => {
     console.log('Sending message:', message);
+    // 清空队列
+    clearQueue();
+    setIsPlaying(false);
     
     // 立即中断当前正在进行的请求
     if (currentAbortControllerRef.current) {
@@ -301,6 +315,7 @@ const Task = () => {
         {/* 会话内容区域 */}
         <ConversationContent
           messages={messages}
+          taskStatus={taskStatus}
         />
 
         {/* 底部输入按钮 */}
