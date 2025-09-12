@@ -23,7 +23,7 @@ export interface TaskResponse {
 }
 
 // 获取任务对话信息
-export async function getTaskConversation(params: TaskRequest): Promise<TaskResponse> {
+export async function getTaskConversation(params: TaskRequest, signal?: AbortSignal): Promise<TaskResponse> {
   try {
     console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ params:", params)
     const response = await fetch('http://10.143.161.42:8111/generate', {
@@ -33,6 +33,7 @@ export async function getTaskConversation(params: TaskRequest): Promise<TaskResp
         'Connection': 'keep-alive',
       },
       body: JSON.stringify(params),
+      signal, // 添加 AbortSignal 支持
     });
     console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ response:", response)
 
@@ -63,13 +64,13 @@ export async function getHistoryConversation(taskId: TaskRequest['task_id']): Pr
         task_id: taskId,
       }),
     });
-    console.log("🚀 ~ 获取任务历史信息 getHistoryConversation ~ response:", response);
-
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
+    
     const data: TaskResponse = await response.json();
+    console.log("🚀 ~ 获取任务历史信息 getHistoryConversation ~ data:", data);
     return data;
   } catch (error) {
     console.error('Error fetching history conversation:', error);

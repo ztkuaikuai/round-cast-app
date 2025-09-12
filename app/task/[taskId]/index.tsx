@@ -28,6 +28,8 @@ const Task = () => {
   const [isLoading, setIsLoading] = useState(false);
   // 使用 ref 来解决闭包问题
   const shouldStopPollingRef = useRef(false);
+  // 用于中断当前请求的 AbortController
+  const currentAbortControllerRef = useRef<AbortController | null>(null);
   
   const {
     isPlaying: isAudioPlaying,
@@ -43,11 +45,23 @@ const Task = () => {
   } = useAudioPlayer();
 
   // 获取任务对话信息
-  const fetchTaskConversation = useCallback(async (currentMessages: Message[] = [], isFirst = false) => {
-    if (isLoading || shouldStopPollingRef.current) {
-      console.log('Skipping fetch:', { isLoading, shouldStopPolling: shouldStopPollingRef.current });
-      return; // 防止重复请求和语音输入时停止轮询
+  const fetchTaskConversation = useCallback(async (currentMessages: Message[] = [], isFirst = false, next = false) => {
+    // next 给打断使用
+    if (!next) {
+      if (isLoading || shouldStopPollingRef.current) {
+        console.log('Skipping fetch:', { isLoading, shouldStopPolling: shouldStopPollingRef.current });
+        return; // 防止重复请求和语音输入时停止轮询
+      }
     }
+
+    // 取消之前的请求
+    if (currentAbortControllerRef.current) {
+      currentAbortControllerRef.current.abort();
+    }
+
+    // 创建新的 AbortController
+    const abortController = new AbortController();
+    currentAbortControllerRef.current = abortController;
 
     setIsLoading(true);
     try {
@@ -58,7 +72,13 @@ const Task = () => {
       };
 
       let response: TaskResponse | null = null;
-      response = await getTaskConversation(params);
+      response = await getTaskConversation(params, abortController.signal);
+
+      // 检查请求是否被中断，如果是则不执行后续逻辑
+      if (abortController.signal.aborted) {
+        console.log('Request was aborted, skipping state updates');
+        return;
+      }
 
       // 更新消息列表
       setMessages(response.context);
@@ -72,20 +92,28 @@ const Task = () => {
       }
 
       // 如果任务仍在进行中且没有被停止轮询，继续获取
-      if (response.status === 1) {
+      if (response.status === 1 && !abortController.signal.aborted) {
         // 递归获取下一条消息，使用 setTimeout 并检查最新的 ref 值
         setTimeout(() => {
-          if (!shouldStopPollingRef.current) {
+          if (!shouldStopPollingRef.current && !abortController.signal.aborted) {
             fetchTaskConversation(response.context);
           } else {
-            console.log('Polling stopped due to voice input');
+            console.log('Polling stopped due to voice input or abort');
           }
         }, 500);
       }
     } catch (error) {
+      // 特别处理请求被中断的情况
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Request was aborted by user action');
+        return; // 中断的请求不需要错误处理
+      }
       console.error('获取任务对话信息失败:', error);
     } finally {
-      setIsLoading(false);
+      // 只有在请求没有被中断的情况下才重置 loading 状态
+      if (!abortController.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [taskId, topic, from, isLoading]);
 
@@ -151,8 +179,19 @@ const Task = () => {
 
   const handleSendMessage = (message: string) => {
     console.log('Sending message:', message);
-    // 重新启用轮询（无论是语音还是文字输入）
-    shouldStopPollingRef.current = false;
+    
+    // 立即中断当前正在进行的请求
+    if (currentAbortControllerRef.current) {
+      console.log('Aborting current request due to user input');
+      currentAbortControllerRef.current.abort();
+      currentAbortControllerRef.current = null;
+    }
+
+    // 停止当前轮询
+    shouldStopPollingRef.current = true;
+    
+    // 重置 loading 状态，因为我们中断了当前请求
+    setIsLoading(false);
 
     const userMessage: Message = {
       chunk_id: messages.length + 1,
@@ -161,8 +200,11 @@ const Task = () => {
     };
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
-    // 发送用户消息后继续获取任务对话
-    fetchTaskConversation(updatedMessages);
+    
+    // 重新启用轮询并发送用户消息后继续获取任务对话
+    shouldStopPollingRef.current = false;
+    fetchTaskConversation(updatedMessages, false, true); // 打断对话，强制获取最新
+    
     setTimeout(() => {
       play(); // 继续播放队列中的音频
     }, 500);
@@ -191,6 +233,18 @@ const Task = () => {
     
   }
 
+  // 组件卸载时清理所有请求
+  useEffect(() => {
+    return () => {
+      // 清理当前的 AbortController
+      if (currentAbortControllerRef.current) {
+        currentAbortControllerRef.current.abort();
+      }
+      // 停止轮询
+      shouldStopPollingRef.current = true;
+    };
+  }, []);
+
   return (
     <Container>
       <View className="flex-1">
@@ -216,7 +270,7 @@ const Task = () => {
         />
 
         {/* 底部输入按钮 */}
-        <BottomInputButton onSendMessage={handleSendMessage} onHandlePressIn={handlePressIn} onHandlePressOut={handlePressOut} />
+        <BottomInputButton  onSendMessage={handleSendMessage} onHandlePressIn={handlePressIn} onHandlePressOut={handlePressOut} />
       </View>
     </Container>
   );
