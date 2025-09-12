@@ -22,50 +22,60 @@ export interface TaskResponse {
   context: Message[];
 }
 
-// 模拟获取任务对话信息的接口
+// 获取任务对话信息
 export async function getTaskConversation(params: TaskRequest): Promise<TaskResponse> {
-  // 模拟网络延迟
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  try {
+    console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ params:", params)
+    const response = await fetch('http://10.143.161.42:8111/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Connection': 'keep-alive',
+      },
+      body: JSON.stringify(params),
+    });
+    console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ response:", response)
 
-  const { task_id, topic, context } = params;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-  // 从mock数据中获取下一条消息
-  const nextMessageIndex = context.length;
-
-  // 检查是否还有更多消息
-  if (nextMessageIndex >= messageMock.length) {
-    // 没有更多消息，返回完成状态
-    return {
-      task_id,
-      status: 0, // 已完成
-      context,
-    };
+    const data: TaskResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching task conversation:', error);
+    // 发生错误时返回错误状态
+    throw new Error(`Failed to fetch task conversation: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
-
-  // 获取下一条消息并添加到context中
-  const nextMessage = messageMock[nextMessageIndex];
-  const newContext = [...context, nextMessage];
-
-  // 判断是否为最后一条消息
-  const isLastMessage = nextMessageIndex === messageMock.length - 1;
-
-  return {
-    task_id,
-    status: isLastMessage ? 0 : 1, // 如果是最后一条消息则状态为完成，否则为进行中
-    context: newContext,
-  };
 }
 
-// 模拟获取任务对话信息的接口
+// 获取任务历史信息的接口
 export async function getHistoryConversation(taskId: TaskRequest['task_id']): Promise<TaskResponse> {
-  // 模拟网络延迟
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  try {
+    console.log("🚀 ~ 获取任务历史信息 getHistoryConversation ~ taskId:", taskId);
+    const response = await fetch('http://10.143.161.42:8111/history', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain',
+        'Connection': 'keep-alive',
+      },
+      body: JSON.stringify({
+        task_id: taskId,
+      }),
+    });
+    console.log("🚀 ~ 获取任务历史信息 getHistoryConversation ~ response:", response);
 
-  return {
-    task_id: taskId,
-    status: 0,
-    context: messageMock,
-  };
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: TaskResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching history conversation:', error);
+    // 发生错误时抛出异常
+    throw new Error(`Failed to fetch history conversation: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 // 模拟发送用户消息的接口

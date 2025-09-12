@@ -50,7 +50,7 @@ const Task = () => {
   } = useAudioPlayer();
 
   // 获取任务对话信息
-  const fetchTaskConversation = useCallback(async (currentMessages: Message[] = []) => {
+  const fetchTaskConversation = useCallback(async (currentMessages: Message[] = [], isFirst = false) => {
     if (isLoading || shouldStopPollingRef.current) {
       console.log('Skipping fetch:', { isLoading, shouldStopPolling: shouldStopPollingRef.current });
       return; // 防止重复请求和语音输入时停止轮询
@@ -65,16 +65,18 @@ const Task = () => {
       };
 
       let response: TaskResponse | null = null;
-      if (from === 'sidebar') {
-        response = await getHistoryConversation(taskId as string);
-      } else {
-        response = await getTaskConversation(params);
-      }
+      response = await getTaskConversation(params);
 
       // 更新消息列表
       setMessages(response.context);
       // 更新任务状态
       setTaskStatus(response.status);
+
+      if (isFirst) {
+        setTimeout(() => {
+          play();
+        }, 500);
+      }
 
       // 如果任务仍在进行中且没有被停止轮询，继续获取
       if (response.status === 1) {
@@ -96,9 +98,23 @@ const Task = () => {
 
   // 组件挂载时开始获取对话信息
   useEffect(() => {
-    if (taskId) {
-      fetchTaskConversation();
+    async function getTask() {
+      if (taskId) {
+        // 先获取历史信息
+        try {
+          const data = await getHistoryConversation(taskId as string);
+          if (data && data.context) {
+            setMessages(data.context);
+            setTaskStatus(data.status);
+          }
+          // 再获取最新的对话
+          fetchTaskConversation(data.context, true); // 初始获取
+        } catch (error) {
+          console.error('获取历史信息失败:', error);
+        }
+      }
     }
+    getTask();
   }, [taskId]);
 
   const prevMessagesRef = useRef<Message[]>([]);
@@ -165,13 +181,6 @@ const Task = () => {
       pause();
     }
   };
-
-  useEffect(() => {
-    // 组件挂载，自动播放
-    setTimeout(() => {
-      play();
-    }, 500);
-  }, []);
 
   const handlePressIn = () => {
     // 按下逻辑 - 语音输入开始，停止轮询
