@@ -25,7 +25,7 @@ export interface TaskResponse {
 // 获取任务对话信息
 export async function getTaskConversation(params: TaskRequest, signal?: AbortSignal): Promise<TaskResponse> {
   try {
-    console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ params:", params)
+    console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ params:", params.task_id, '最后一项', params.context.at(-1))
     const response = await fetch('http://10.143.161.42:8111/generate', {
       method: 'POST',
       headers: {

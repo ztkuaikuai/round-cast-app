@@ -107,6 +107,7 @@ const Task = () => {
 
       if (isFirst) {
         createTrackedTimeout(() => {
+          setIsPlaying(true);
           play();
         }, 500);
       }
@@ -151,6 +152,7 @@ const Task = () => {
           if (data.status === 0 && data.context.length > 0 && from === 'sidebar') {
             // 如果任务已完成，且是从侧边栏进入的，不用继续请求，并在500ms后播放
             createTrackedTimeout(() => {
+              setIsPlaying(true);
               play();
             }, 500);
             return;
@@ -229,6 +231,7 @@ const Task = () => {
     fetchTaskConversation(updatedMessages, false, true); // 打断对话，强制获取最新
     
     createTrackedTimeout(() => {
+      setIsPlaying(true);
       play(); // 继续播放队列中的音频
     }, 500);
   };
@@ -250,6 +253,7 @@ const Task = () => {
     console.log('Voice input started - stopping polling');
     shouldStopPollingRef.current = true;
     clearQueue();
+    setIsPlaying(false);
   }
 
   const handlePressOut = () => {
