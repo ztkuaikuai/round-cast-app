@@ -195,7 +195,7 @@ const Task = () => {
 
       prevMessagesRef.current = messages;
     }
-  }, [messages.length, enqueueMultiple]);
+  }, [messages, enqueueMultiple]);
 
   const handleSendMessage = (message: string) => {
     console.log('Sending message:', message);
