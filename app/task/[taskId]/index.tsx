@@ -90,8 +90,10 @@ const Task = () => {
       setTaskStatus(response.status);
 
       // 播放
-      setIsPlaying(true);
-      play();
+      setTimeout(() => {
+        setIsPlaying(true);
+        play();
+      }, 200);
 
       // 如果任务仍在进行中，继续轮询
       if (response.status === 1 && !abortController.signal.aborted) {
