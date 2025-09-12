@@ -61,7 +61,7 @@ const Task = () => {
     enqueue,
     enqueueMultiple,
     clearQueue,
-    getCurrentUrl
+    getCurrentVoiceId
   } = useAudioPlayer();
 
   // 获取任务对话信息

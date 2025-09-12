@@ -91,7 +91,6 @@ const TypewriterText = React.memo(({ text, style, isActive, onComplete }: Typewr
 });
 
 const ConversationContent = ({ messages }: ConversationContentProps) => {
-  console.log("🚀 ~ ConversationContent ~ messages最新消息:", messages.at(-1))
   const { scale, verticalScale } = useResponsive();
   const scrollViewRef = useRef<ScrollView>(null);
   
