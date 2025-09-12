@@ -5,7 +5,7 @@ export interface Message {
   chunk_id: number;
   speaker_name: string;
   content: string;
-  url?: string;
+  voice_id?: string;
 }
 
 // 任务请求参数

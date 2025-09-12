@@ -29,13 +29,6 @@ const Task = () => {
   // 使用 ref 来解决闭包问题
   const shouldStopPollingRef = useRef(false);
   
-  // 用户正看到的消息索引
-  const [visibleMessageIndex, setVisibleMessageIndex] = useState(-1);
-  const updateVisibleMessageIndex = (index: number) => {
-    if (index > visibleMessageIndex) {
-      setVisibleMessageIndex(index);
-    }
-  };
   const {
     isPlaying: isAudioPlaying,
     isLoading: isAudioLoading,
@@ -107,6 +100,13 @@ const Task = () => {
             setMessages(data.context);
             setTaskStatus(data.status);
           }
+          if (data.status === 0 && data.context.length > 0 && from === 'sidebar') {
+            // 如果任务已完成，且是从侧边栏进入的，不用继续请求，并在500ms后播放
+            setTimeout(() => {
+              play();
+            }, 500);
+            return;
+          }
           // 再获取最新的对话
           fetchTaskConversation(data.context, true); // 初始获取
         } catch (error) {
@@ -154,12 +154,10 @@ const Task = () => {
     // 重新启用轮询（无论是语音还是文字输入）
     shouldStopPollingRef.current = false;
 
-    // TODO))追加用户信息
     const userMessage: Message = {
       chunk_id: messages.length + 1,
       speaker_name: 'user',
       content: message,
-      url: '',
     };
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
@@ -215,7 +213,6 @@ const Task = () => {
         {/* 会话内容区域 */}
         <ConversationContent
           messages={messages}
-          updateVisibleMessageIndex={updateVisibleMessageIndex}
         />
 
         {/* 底部输入按钮 */}
