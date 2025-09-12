@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, Platform } from 'react-native';
+import { View, Text, ScrollView, Platform, TouchableOpacity } from 'react-native';
+import Svg, { Path, Circle } from 'react-native-svg';
 import { useResponsive } from 'utils/responsive';
 import LoadingAnimation from 'components/LoadingAnimation';
 import WaitingForContentAnimation from 'components/WaitingForContentAnimation';
@@ -8,6 +9,7 @@ import { Message } from 'api/task';
 interface ConversationContentProps {
   messages: Message[];
   taskStatus: 1 | 0; // 1-进行中, 0-已完成
+  onPlayFromMessage?: (messageIndex: number) => void; // 从指定消息开始播放的回调
 }
 
 // TypewriterText 组件 - 处理单个消息的打字机效果
@@ -93,7 +95,36 @@ const TypewriterText = React.memo(({ text, style, isActive, isHistory, onComplet
   );
 });
 
-const ConversationContent = ({ messages, taskStatus }: ConversationContentProps) => {
+// PlayIcon 组件 - 播放按钮图标（带圆形外轮廓）
+const PlayIcon = React.memo(() => {
+  const { scale } = useResponsive();
+  
+  return (
+    <Svg
+      width={scale(20)}
+      height={scale(20)}
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      {/* 圆形外轮廓 */}
+      <Circle
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="#1E0F59"
+        strokeWidth="1.5"
+        fill="none"
+      />
+      {/* 播放三角形 */}
+      <Path 
+        d="M10 8v8l6-4z" 
+        fill="#1E0F59"
+      />
+    </Svg>
+  );
+});
+
+const ConversationContent = ({ messages, taskStatus, onPlayFromMessage }: ConversationContentProps) => {
   const { scale, verticalScale } = useResponsive();
   const scrollViewRef = useRef<ScrollView>(null);
   
@@ -137,7 +168,7 @@ const ConversationContent = ({ messages, taskStatus }: ConversationContentProps)
     return `${speaker}:`;
   };
 
-  const getSpeakerStyle = (role: string) => {
+  const getSpeakerStyle = () => {
     // 基础样式
     const baseStyle = {
       fontFamily: 'Montserrat',
@@ -185,21 +216,39 @@ const ConversationContent = ({ messages, taskStatus }: ConversationContentProps)
           
           return (
             <View key={message.chunk_id} style={{ marginBottom: verticalScale(20) }}>
-              {/* 说话人名称 */}
-              <Text
-                style={{
-                  ...getSpeakerStyle(message.speaker_name),
-                  fontFamily: '',
-                  fontWeight: Platform.OS === 'ios' ? ('700' as const) : ('900' as const),
-                  marginBottom: verticalScale(4),
-                }}>
-                {getSpeakerDisplayName(message.speaker_name)}
-              </Text>
+              {/* 说话人名称区域 */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: verticalScale(4) }}>
+                {/* 说话人名称 */}
+                <Text
+                  style={{
+                    ...getSpeakerStyle(),
+                    fontFamily: '',
+                    fontWeight: Platform.OS === 'ios' ? ('700' as const) : ('900' as const),
+                  }}>
+                  {getSpeakerDisplayName(message.speaker_name)}
+                </Text>
+
+                {/* 播放按钮 - 只在有voice_id的AI消息上显示 */}
+                {message.speaker_name !== 'user' && 
+                 message.voice_id && 
+                 onPlayFromMessage && (
+                  <TouchableOpacity
+                    onPress={() => onPlayFromMessage(index)}
+                    style={{
+                      paddingHorizontal: scale(4),
+                      paddingVertical: scale(4),
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    <PlayIcon />
+                  </TouchableOpacity>
+                )}
+              </View>
 
               {/* 消息内容 - 使用打字机效果 */}
               <TypewriterText
                 text={message.content}
-                style={getSpeakerStyle(message.speaker_name)}
+                style={getSpeakerStyle()}
                 isActive={isLastMessage && isTypingActive}
                 isHistory={message.isHistory}
                 onComplete={handleTypingComplete}

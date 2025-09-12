@@ -195,6 +195,9 @@ const Task = () => {
     clearQueue();
     setIsPlaying(false);
 
+    // 设置任务状态
+    setTaskStatus(1);
+
     // 添加用户消息
     const userMessage: Message = {
       chunk_id: messages.length + 1,
@@ -235,6 +238,26 @@ const Task = () => {
     
   }
 
+  const handlePlayFromMessage = (messageIndex: number) => {
+    console.log('Play from message index:', messageIndex);
+    
+    // 停止当前播放并清空队列
+    clearQueue();
+    setIsPlaying(false);
+    
+    // 获取从指定消息开始的所有后续消息
+    const messagesFromIndex = messages.slice(messageIndex);
+    
+    if (messagesFromIndex.length > 0) {
+      // 将消息加入播放队列并开始播放
+      enqueueMultiple(messagesFromIndex);
+      setTimeout(() => {
+        setIsPlaying(true);
+        play();
+      }, 200);
+    }
+  };
+
   // 组件卸载时清理所有请求
   useEffect(() => {
     return () => {
@@ -266,6 +289,7 @@ const Task = () => {
         <ConversationContent
           messages={messages}
           taskStatus={taskStatus}
+          onPlayFromMessage={handlePlayFromMessage}
         />
 
         {/* 底部输入按钮 */}
