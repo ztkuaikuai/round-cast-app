@@ -22,8 +22,58 @@ interface ChatMessage {
 const Home = () => {
   const { scale, verticalScale } = useResponsive();
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [showChat, setShowChat] = useState(false);
+  // 默认mock消息数据
+  const defaultMessages: ChatMessage[] = [
+    {
+      id: '1757740445447',
+      type: 'user',
+      content: '如何看待浙江工业大学开学典礼校长讲话时被两位同学打伞，正好雨从中间流过流到校长头上，俗称 双一流（狗头）',
+      timestamp: '2025-01-13T10:30:00.000Z',
+    },
+    {
+      id: '1757740445448',
+      type: 'agent',
+      content: '哇，这个观点太棒了！圆桌上的朋友们怎么看？',
+      userQuery: '如何看待浙江工业大学开学典礼校长讲话时被两位同学打伞，正好雨从中间流过流到校长头上，俗称 双一流（狗头）',
+      timestamp: '2025-01-13T10:30:15.000Z',
+      imageCard: {
+        title: '来参与不同视角的碰撞',
+      },
+    },
+    {
+      id: '1757738774709',
+      type: 'user',
+      content: '虞书欣家庭背景很硬吗',
+      timestamp: '2025-01-13T10:32:00.000Z',
+    },
+    {
+      id: '1757738774710',
+      type: 'agent',
+      content: '这个话题让我想起了最近的热门讨论，我们展开聊聊？',
+      userQuery: '虞书欣家庭背景很硬吗',
+      timestamp: '2025-01-13T10:32:10.000Z',
+      imageCard: {},
+    },
+    {
+      id: '1757738086064',
+      type: 'user',
+      content: '自动驾驶汽车什么时候会落地',
+      timestamp: '2025-01-13T10:34:00.000Z',
+    },
+    {
+      id: '1757738086065',
+      type: 'agent',
+      content: '圆桌时间！大家各抒己见吧～',
+      userQuery: '自动驾驶汽车什么时候会落地',
+      timestamp: '2025-01-13T10:34:08.000Z',
+      imageCard: {
+        title: '这个观点真有趣，大家怎么看？',
+      },
+    },
+  ];
+
+  const [messages, setMessages] = useState<ChatMessage[]>(defaultMessages);
+  const [showChat, setShowChat] = useState(true);
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(false);
 
   // 模拟 Agent 响应的假数据
@@ -135,8 +185,6 @@ const Home = () => {
       } catch (error) {
         console.error('Failed to save chat session:', error);
       }
-
-      // TODO)) 调用服务端接口，让 Agent 执行任务
 
       setMessages((prev) => [...prev, agentMessage]);
       setShouldScrollToBottom(true);

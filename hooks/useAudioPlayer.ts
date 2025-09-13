@@ -137,7 +137,7 @@ const synthesizeAudioFromVoiceId = async (voiceId: string, message: Message): Pr
         return hexToAudioDataUri(data.data.audio);
 
     } catch (error) {
-        console.error('Error synthesizing audio:', error);
+        console.warn('Error synthesizing audio:', error);
         
         // 提供更详细的错误信息
         if (error instanceof Error) {
@@ -237,7 +237,7 @@ export const useAudioPlayer = (): UseAudioPlayerReturn => {
                     }));
 
                 } catch (error) {
-                    console.error('Error playing audio:', error);
+                    console.warn('Error playing audio:', error);
                     
                     let errorMessage = 'Failed to play audio';
                     if (error instanceof Error) {
