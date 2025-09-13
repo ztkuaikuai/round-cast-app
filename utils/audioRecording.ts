@@ -192,7 +192,7 @@ export function useAudioRecording({
         return null;
       }
     } catch (error) {
-      console.error('停止录音失败:', error);
+      console.warn('停止录音失败:', error);
       const errorMsg = `录音保存失败: ${error}`;
       onRecordingError?.(errorMsg);
       setRecordingState((prev) => ({

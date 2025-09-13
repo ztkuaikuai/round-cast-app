@@ -27,7 +27,7 @@ export interface TaskResponse {
 export async function getTaskConversation(params: TaskRequest, signal?: AbortSignal): Promise<TaskResponse> {
   try {
     console.log("🚀 ~ 获取任务对话信息 getTaskConversation ~ params:", params.task_id, '最后一项', params.context.at(-1))
-    const response = await fetch('http://10.143.161.42:8111/generate', {
+    const response = await fetch('http://10.143.161.42:8114/generate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ export async function getTaskConversation(params: TaskRequest, signal?: AbortSig
 export async function getHistoryConversation(taskId: TaskRequest['task_id']): Promise<TaskResponse> {
   try {
     console.log("🚀 ~ 获取任务历史信息 getHistoryConversation ~ taskId:", taskId);
-    const response = await fetch('http://10.143.161.42:8111/history', {
+    const response = await fetch('http://10.143.161.42:8114/history', {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain',

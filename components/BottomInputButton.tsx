@@ -119,13 +119,12 @@ const BottomInputButton = ({ onSendMessage, onHandlePressIn, onHandlePressOut }:
       }
     },
     onRecordingError: (error) => {
-      console.error('录音错误:', error);
+      console.warn('录音错误:', error);
       setSpeechStatus('error');
-      Alert.alert('录音失败', error);
 
       setTimeout(() => {
         setSpeechStatus('idle');
-      }, 2000);
+      }, 4);
     },
     maxDuration: 60000, // 最大60秒
     enableMetering: true,
