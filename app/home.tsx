@@ -1,7 +1,7 @@
 import { Container } from 'components/Container';
 import BottomInputButton from 'components/BottomInputButton';
 import ChatMessages from 'components/ChatMessages';
-import { View, Text, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, Platform, ScrollView } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
 import { useResponsive } from 'utils/responsive';
 import { useRouter } from 'expo-router';
@@ -19,9 +19,24 @@ interface ChatMessage {
   };
 }
 
+interface RecommendedQuery {
+  id: string;
+  content: string;
+}
+
 const Home = () => {
   const { scale, verticalScale } = useResponsive();
   const router = useRouter();
+  
+  // 推荐查询数据
+  const recommendedQueries: RecommendedQuery[] = [
+    { id: 'query1', content: '如何看待浙江工业大学开学典礼校长讲话时被两位同学打伞，正好雨从中间流过流到校长头上，俗称 双一流（狗头）' },
+    { id: 'query2', content: '虞书欣家庭背景很硬吗' },
+    { id: 'query3', content: '自动驾驶汽车什么时候会落地' },
+    { id: 'query4', content: 'AI在教育领域的应用前景如何' },
+    { id: 'query5', content: '新能源汽车和传统汽车的优缺点对比' },
+  ];
+  
   // 默认mock消息数据
   const defaultMessages: ChatMessage[] = [
     {
@@ -284,6 +299,49 @@ const Home = () => {
             </Text>
           </View>
         )}
+
+        {/* Recommended Queries Section */}
+        <View style={{ marginBottom: verticalScale(8) }}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: scale(15),
+            }}
+            style={{ backgroundColor: 'transparent' }}
+          >
+            {recommendedQueries.map((query, index) => (
+              <TouchableOpacity
+                key={query.id}
+                activeOpacity={0.7}
+                style={{
+                  backgroundColor: 'rgba(255, 247, 211, 0.9)',
+                  borderWidth: 1,
+                  borderColor: '#1E0F59',
+                  borderRadius: scale(20),
+                  paddingHorizontal: scale(16),
+                  paddingVertical: verticalScale(10),
+                  marginRight: index === recommendedQueries.length - 1 ? 0 : scale(8),
+                }}
+                onPress={() => handleSendMessage(query.content)}
+              >
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="clip"
+                  style={{
+                    fontFamily: 'Montserrat',
+                    fontSize: scale(14),
+                    lineHeight: verticalScale(18),
+                    color: '#1E0F59',
+                    fontWeight: '700',
+                  }}
+                >
+                  {query.content}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
 
         {/* Bottom Section with BottomInputButton Component */}
         <BottomInputButton onSendMessage={handleSendMessage} />
