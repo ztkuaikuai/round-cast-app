@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { View, Text, ScrollView, Platform, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Platform, TouchableOpacity, Animated } from 'react-native';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useResponsive } from 'utils/responsive';
 import LoadingAnimation from 'components/LoadingAnimation';
@@ -95,30 +95,30 @@ const TypewriterText = React.memo(({ text, style, isActive, isHistory, onComplet
   );
 });
 
-// PlayIcon 组件 - 播放按钮图标（带圆形外轮廓）
-const PlayIcon = React.memo(() => {
+// PlayIcon 组件 - 播放按钮图标（优化设计）
+const PlayIcon = React.memo(({ isPressed = false }: { isPressed?: boolean }) => {
   const { scale } = useResponsive();
   
   return (
     <Svg
-      width={scale(20)}
-      height={scale(20)}
+      width={scale(24)}
+      height={scale(24)}
       viewBox="0 0 24 24"
       fill="none"
     >
-      {/* 圆形外轮廓 */}
+      {/* 圆形背景 */}
       <Circle
         cx="12"
         cy="12"
-        r="10"
+        r="11"
+        fill={isPressed ? "#1E0F59" : "rgba(30, 15, 89, 0.08)"}
         stroke="#1E0F59"
         strokeWidth="1.5"
-        fill="none"
       />
       {/* 播放三角形 */}
       <Path 
-        d="M10 8v8l6-4z" 
-        fill="#1E0F59"
+        d="M9.5 7.5v9l7-4.5z" 
+        fill={isPressed ? "#FFF7D3" : "#1E0F59"}
       />
     </Svg>
   );
@@ -132,6 +132,10 @@ const ConversationContent = ({ messages, taskStatus, onPlayFromMessage }: Conver
   const [activeTypingMessageId, setActiveTypingMessageId] = useState<number | null>(null);
   // 追踪打字机是否完成
   const [isTypingComplete, setIsTypingComplete] = useState(false);
+  
+  // 点击动画状态管理
+  const [pressedMessageId, setPressedMessageId] = useState<number | null>(null);
+  const animationValues = useRef<{[key: number]: Animated.Value}>({}).current;
 
   // 当消息更新时，处理打字机效果和自动滚动
   useEffect(() => {
@@ -160,6 +164,41 @@ const ConversationContent = ({ messages, taskStatus, onPlayFromMessage }: Conver
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 50);
   }, []);
+
+  // 初始化动画值
+  const getAnimationValue = useCallback((messageId: number) => {
+    if (!animationValues[messageId]) {
+      animationValues[messageId] = new Animated.Value(1);
+    }
+    return animationValues[messageId];
+  }, [animationValues]);
+
+  // 处理消息点击
+  const handleMessagePress = useCallback((messageIndex: number, messageId: number) => {
+    if (!onPlayFromMessage) return;
+    
+    const animValue = getAnimationValue(messageId);
+    setPressedMessageId(messageId);
+    
+    // 点击动画效果
+    Animated.sequence([
+      Animated.timing(animValue, {
+        toValue: 0.95,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(animValue, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      })
+    ]).start(() => {
+      setPressedMessageId(null);
+    });
+    
+    // 触发播放回调
+    onPlayFromMessage(messageIndex);
+  }, [onPlayFromMessage, getAnimationValue]);
 
   const getSpeakerDisplayName = (speaker: Message['speaker_name']) => {
     if (speaker === 'user') {
@@ -213,7 +252,69 @@ const ConversationContent = ({ messages, taskStatus, onPlayFromMessage }: Conver
         {messages.map((message, index) => {
           const isLastMessage = index === messages.length - 1;
           const isTypingActive = activeTypingMessageId === message.chunk_id;
+          const isPlayable = message.speaker_name !== 'user' && message.voice_id && onPlayFromMessage;
+          const animValue = getAnimationValue(message.chunk_id);
+          const isPressed = pressedMessageId === message.chunk_id;
           
+          // 如果消息可播放，使用 Animated.View 和 TouchableOpacity 包裹
+          if (isPlayable) {
+            return (
+              <Animated.View 
+                key={message.chunk_id} 
+                style={{ 
+                  marginBottom: verticalScale(20),
+                  transform: [{ scale: animValue }]
+                }}
+              >
+                <TouchableOpacity
+                  onPress={() => handleMessagePress(index, message.chunk_id)}
+                  activeOpacity={0.8}
+                  style={{
+                    padding: scale(12),
+                    marginHorizontal: scale(-12),
+                    borderRadius: scale(12),
+                    backgroundColor: isPressed ? 'rgba(30, 15, 89, 0.08)' : 'rgba(30, 15, 89, 0.02)',
+                    borderWidth: 1,
+                    borderColor: isPressed ? 'rgba(30, 15, 89, 0.15)' : 'rgba(30, 15, 89, 0.05)',
+                  }}
+                >
+                  {/* 说话人名称区域 */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: verticalScale(4) }}>
+                    {/* 说话人名称 */}
+                    <Text
+                      style={{
+                        ...getSpeakerStyle(),
+                        fontFamily: '',
+                        fontWeight: Platform.OS === 'ios' ? ('700' as const) : ('900' as const),
+                      }}>
+                      {getSpeakerDisplayName(message.speaker_name)}
+                    </Text>
+
+                    {/* 播放按钮图标 - 作为视觉提示 */}
+                    <View
+                      style={{
+                        paddingHorizontal: scale(4),
+                        paddingVertical: scale(4),
+                      }}
+                    >
+                      <PlayIcon isPressed={isPressed} />
+                    </View>
+                  </View>
+
+                  {/* 消息内容 - 使用打字机效果 */}
+                  <TypewriterText
+                    text={message.content}
+                    style={getSpeakerStyle()}
+                    isActive={isLastMessage && isTypingActive}
+                    isHistory={message.isHistory}
+                    onComplete={handleTypingComplete}
+                  />
+                </TouchableOpacity>
+              </Animated.View>
+            );
+          }
+          
+          // 用户消息保持原样（不可点击）
           return (
             <View key={message.chunk_id} style={{ marginBottom: verticalScale(20) }}>
               {/* 说话人名称区域 */}
@@ -227,22 +328,6 @@ const ConversationContent = ({ messages, taskStatus, onPlayFromMessage }: Conver
                   }}>
                   {getSpeakerDisplayName(message.speaker_name)}
                 </Text>
-
-                {/* 播放按钮 - 只在有voice_id的AI消息上显示 */}
-                {message.speaker_name !== 'user' && 
-                 message.voice_id && 
-                 onPlayFromMessage && (
-                  <TouchableOpacity
-                    onPress={() => onPlayFromMessage(index)}
-                    style={{
-                      paddingHorizontal: scale(4),
-                      paddingVertical: scale(4),
-                    }}
-                    activeOpacity={0.7}
-                  >
-                    <PlayIcon />
-                  </TouchableOpacity>
-                )}
               </View>
 
               {/* 消息内容 - 使用打字机效果 */}

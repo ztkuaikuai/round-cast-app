@@ -71,7 +71,7 @@ const synthesizeAudioFromVoiceId = async (voiceId: string, message: Message): Pr
                 speed: 1.1,
                 vol: 1.0,
                 pitch: 0,
-                emotion: "happy"
+                // emotion: "happy"
             },
             audio_setting: {
                 sample_rate: 32000,
