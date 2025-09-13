@@ -49,6 +49,7 @@ const ChatMessages = ({ messages, onImageCardPress, scrollToBottom }: ChatMessag
       contentContainerStyle={{
         paddingHorizontal: scale(18),
         paddingVertical: verticalScale(20),
+        paddingBottom: verticalScale(40),
       }}
       showsVerticalScrollIndicator={false}
       // 优化滚动性能和体验的属性

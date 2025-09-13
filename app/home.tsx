@@ -30,11 +30,11 @@ const Home = () => {
   
   // 推荐查询数据
   const recommendedQueries: RecommendedQuery[] = [
-    { id: 'query1', content: '如何看待浙江工业大学开学典礼校长讲话时被两位同学打伞，正好雨从中间流过流到校长头上，俗称 双一流（狗头）' },
-    { id: 'query2', content: '虞书欣家庭背景很硬吗' },
-    { id: 'query3', content: '自动驾驶汽车什么时候会落地' },
-    { id: 'query4', content: 'AI在教育领域的应用前景如何' },
-    { id: 'query5', content: '新能源汽车和传统汽车的优缺点对比' },
+    { id: 'democase2', content: '京东，美团，饿了么，在外卖领域的竞争动态' },
+    { id: 'democase3', content: '父母是否应该查看子女的手机？' },
+    { id: 'democase1', content: '消费主义如何把“自我关怀”包装成刚需？' },
+    { id: 'democase4', content: '在线教育能否取代传统课堂教育？' },
+    { id: 'democase5', content: '短视频平台侵蚀长视频市场，是否会导致公众深度思考能力的退化？' },
   ];
   
   // 默认mock消息数据
@@ -301,7 +301,13 @@ const Home = () => {
         )}
 
         {/* Recommended Queries Section */}
-        <View style={{ marginBottom: verticalScale(8) }}>
+        <View style={{ 
+          position: 'absolute',
+          bottom: verticalScale(86),
+          left: 0,
+          right: 0,
+          zIndex: 10,
+        }}>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
