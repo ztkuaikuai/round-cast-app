@@ -64,8 +64,8 @@ const ChatMessages = ({ messages, onImageCardPress, scrollToBottom }: ChatMessag
       }}
       // 确保内容能够完整显示
       contentInsetAdjustmentBehavior="automatic">
-      {messages.map((message) => (
-        <MessageBubble key={message.id} message={message} onImageCardPress={onImageCardPress} />
+      {messages.map((message, index) => (
+        <MessageBubble key={index} message={message} onImageCardPress={onImageCardPress} />
       ))}
     </ScrollView>
   );

@@ -295,10 +295,12 @@ const BottomInputButton = ({ onSendMessage, onHandlePressIn, onHandlePressOut }:
                     fontSize: scale(speechStatus === 'processing' ? 20 : 28),
                     lineHeight: verticalScale(42),
                     textAlignVertical: 'center',
+                    fontWeight: '700',
+                    letterSpacing: scale(2),
                   }}>
-                  {speechStatus === 'idle' && 'Hold to Speak'}
-                  {speechStatus === 'processing' && 'Processing...'}
-                  {speechStatus === 'completed' && 'Done!'}
+                  {speechStatus === 'idle' && '按住说话'}
+                  {speechStatus === 'processing' && '识别中...'}
+                  {speechStatus === 'completed' && '按住说话'}
                   {speechStatus === 'error' && 'Error'}
                 </Text>
               </Animated.View>
@@ -347,7 +349,7 @@ const BottomInputButton = ({ onSendMessage, onHandlePressIn, onHandlePressOut }:
                   paddingBottom: scale(16),
                   textAlignVertical: 'center',
                 }}
-                placeholder="What do you want to know?"
+                placeholder="来加入这场圆桌讨论"
                 placeholderTextColor="#656565"
                 value={inputText}
                 onChangeText={setInputText}

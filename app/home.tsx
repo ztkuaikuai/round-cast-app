@@ -30,11 +30,10 @@ const Home = () => {
   
   // 推荐查询数据
   const recommendedQueries: RecommendedQuery[] = [
-    { id: 'democase2', content: '京东，美团，饿了么，在外卖领域的竞争动态' },
-    { id: 'democase3', content: '父母是否应该查看子女的手机？' },
-    { id: 'democase1', content: '消费主义如何把“自我关怀”包装成刚需？' },
-    { id: 'democase4', content: '在线教育能否取代传统课堂教育？' },
-    { id: 'democase5', content: '短视频平台侵蚀长视频市场，是否会导致公众深度思考能力的退化？' },
+    { id: '100000001', content: '京东，美团，饿了么，在外卖领域的竞争动态' },
+    { id: '100000003', content: '消费主义如何把“自我关怀”包装成刚需？' },
+    { id: '100000004', content: '在线教育能否取代传统课堂教育？' },
+    { id: '100000005', content: '短视频平台侵蚀长视频市场，是否会导致公众深度思考能力的退化？' },
   ];
   
   // 默认mock消息数据
@@ -212,6 +211,49 @@ const Home = () => {
     // 这里可以添加跳转到播客播放页面的逻辑
   };
 
+  // 处理推荐查询消息发送
+  const handleSendDemoCaseMessage = (query: RecommendedQuery) => {
+    console.log('Demo case message sent:', query);
+
+    // 根据query的id和content生成消息
+    const userMessage: ChatMessage = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: query.content,
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setShowChat(true);
+    setShouldScrollToBottom(true);
+
+    // 模拟 Agent 延迟响应
+    setTimeout(async () => {
+      const responseIndex = Math.floor(Math.random() * mockAgentResponses.length);
+      const mockResponse = mockAgentResponses[responseIndex];
+
+      const agentMessage: ChatMessage = {
+        id: query.id,
+        type: 'agent',
+        content: mockResponse.content,
+        userQuery: query.content,
+        timestamp: new Date().toISOString(),
+        imageCard: mockResponse.imageCard,
+      };
+
+      // 保存聊天会话到本地存储
+      try {
+        await ChatSessionStorage.addSession(agentMessage.id, query.content);
+        console.log('Chat session saved:', { id: agentMessage.id, title: query.content });
+      } catch (error) {
+        console.error('Failed to save chat session:', error);
+      }
+
+      setMessages((prev) => [...prev, agentMessage]);
+      setShouldScrollToBottom(true);
+    }, 1000);
+  };
+
   // 重置滚动状态，避免每次组件更新都触发滚动
   useEffect(() => {
     if (shouldScrollToBottom) {
@@ -329,7 +371,7 @@ const Home = () => {
                   paddingVertical: verticalScale(10),
                   marginRight: index === recommendedQueries.length - 1 ? 0 : scale(8),
                 }}
-                onPress={() => handleSendMessage(query.content)}
+                onPress={() => handleSendDemoCaseMessage(query)}
               >
                 <Text
                   numberOfLines={1}
